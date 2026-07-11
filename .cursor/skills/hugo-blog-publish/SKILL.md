@@ -1,19 +1,24 @@
 ---
 name: hugo-blog-publish
-description: 为 Hugo LoveIt 博客文章填充 front matter 并发布到 content/posts/。适用于用户在 Typora/Obsidian 写好正文后，要求「填充属性」「补全 front matter」「发布文章」「导入到博客」等场景。默认博客路径 /Users/simon/Documents/MyWebSite/MyBlog，默认语言 zh-cn。
+description: 为 Hugo LoveIt 博客填充 front matter、发布中文文章、自动补齐英文版（.en.md），并默认 git commit + push 到 GitHub。用户说「本地测试」时跳过推送。适用于「填充属性」「发布文章」「补齐英文」等场景。默认博客 /Users/simon/Documents/MyWebSite/MyBlog。
 ---
 
 # Hugo 博客发布 Skill
 
 ## 目标
 
-用户**只写正文**（Markdown），Agent 负责：
+用户**只写中文正文**（Markdown），Agent 负责：
 
 1. 解析源文件（Obsidian / Typora / drafts 任意路径）
-2. **生成或补全** Hugo front matter
-3. 写入 `content/posts/`
-4. `hugo build` 验证
-5. 按需 `git commit`（仅用户明确要求时）
+2. **生成或补全** Hugo front matter（中文版）
+3. 写入 `content/posts/{slug}.md`
+4. **自动翻译并补齐** `content/posts/{slug}.en.md`（默认开启）
+5. 处理图片路径与 `<!--more-->`
+6. `hugo build` 验证
+7. **`git commit` + `git push`**（默认执行，触发 Cloudflare 部署）
+8. 返回预览 URL
+
+详细英文翻译规则见 [reference-en.md](reference-en.md)。
 
 ## 博客约定
 
@@ -21,139 +26,163 @@ description: 为 Hugo LoveIt 博客文章填充 front matter 并发布到 conten
 |----|-----|
 | 项目根 | `/Users/simon/Documents/MyWebSite/MyBlog` |
 | 文章目录 | `content/posts/` |
-| 本地草稿目录 | `drafts/`（可选，非必须） |
-| 默认语言 | `zh-cn` → `posts/slug.md` |
-| 英文版 | `posts/slug.en.md` |
+| Git 远程 | `origin` → `https://github.com/simonlee-hello/MyBlog.git` |
+| 默认分支 | `main` |
+| 本地草稿目录 | `drafts/` |
+| 中文 | `posts/{slug}.md` 或 `posts/{slug}/index.md` |
+| 英文 | `posts/{slug}.en.md` 或 `posts/{slug}/index.en.md` |
 | 主题 | LoveIt |
 
 ## 触发词
 
 - 填充属性 / 补全 front matter / 发布文章 / 导入博客
+- **补齐英文 / 同步英文版 / 翻译英文 / 生成 en 版**
 - Obsidian 或 Typora 文章发布到 Hugo
+
+**跳过规则：**
+
+| 用户说 | 跳过 |
+|--------|------|
+| 「仅中文」「不要英文」 | 步骤 4（英文版） |
+| 「本地测试」「不要推送」「别 push」 | 步骤 7（Git） |
 
 ## 工作流程
 
 ### 1. 定位源文件
 
-按优先级：
+1. 用户给出的路径
+2. `drafts/` 下指定文件
+3. Obsidian 默认：`/Users/simon/Documents/ObsidianVault/obsidian-note/Blog/`
 
-1. 用户给出的绝对/相对路径
-2. `drafts/` 下用户指定的文件名
-3. Obsidian 默认草稿：`/Users/simon/Documents/ObsidianVault/obsidian-note/Blog/`（用户可覆盖）
-
-源文件可以**没有** front matter，或只有 Obsidian Properties。
-
-### 2. 解析已有元数据
-
-合并以下来源（后者不覆盖已有明确值）：
+### 2. 解析元数据（中文）
 
 | 来源 | 映射 |
 |------|------|
-| 已有 YAML front matter | 直接保留 |
+| YAML front matter | 直接保留 |
 | Obsidian Properties | `title` `date` `tags` `categories` `description` `draft` `slug` |
-| 正文首行 `# 标题` | `title` |
-| 正文 `#tag`（非标题） | `tags` |
-| 文件名 | `slug`（kebab-case，英文） |
+| 正文 `# 标题` | `title` |
+| 正文 `#tag` | `tags` |
+| 文件名 | `slug`（kebab-case 英文） |
 
-### 3. 自动填充规则
+### 3. 自动填充 front matter（中文）
 
 ```yaml
 ---
-title: ""          # 首行 H1 > Properties > 文件名转标题
-date: ""           # Properties > 文件修改时间 > 当前时间（+08:00）
-draft: true        # 默认 true；用户说「发布」时改 false
-description: ""  # 首段纯文本，截断 120 字
-categories: []     # Properties > 推断（见下）> 默认 ["随笔"]
-tags: []           # Properties + 正文 #tag，去重，小写
-slug: ""           # 文件名 kebab-case；中文标题需转拼音或用户指定英文 slug
+title: ""
+date: ""           # +08:00
+draft: true        # 用户说「发布」时 false
+description: ""    # 首段，≤120 字
+categories: []     # 默认「随笔」，见 reference-en.md 映射
+tags: []
 ---
 ```
 
-**categories 推断**（取第一个匹配）：
+**slug**：只用 `[a-z0-9-]`，纯中文标题时生成英文语义 slug。
 
-- 安全/渗透/漏洞 → `安全`
-- Hugo/前端/编程/代码 → `技术`
-- 否则 → `随笔`
+### 4. 正文处理（中文）
 
-**slug 规则**：
+- 清理 Obsidian 语法（`![[wiki]]` → 标准 Markdown）
+- 无 `<!--more-->` 时在第一段后插入
+- 本地图片 → 复制到 `static/images/posts/{slug}/` 或 Page Bundle 同目录，重写路径
 
-- 只用 `[a-z0-9-]`
-- 用户未指定时：从英文 title 生成；纯中文 title 用简短英文语义 slug（如 `my-first-post`），**不要**用中文做文件名
+### 5. 写入中文版
 
-### 4. 正文处理
+写入 `content/posts/{slug}.md`（禁止 `.zh-cn.md` 后缀）。
 
-- 移除 Obsidian 专属语法（`![[wiki]]`、`%% comment %%`）或转为 Hugo 兼容格式
-- 若无 `<!--more-->`：在第一段后插入
-- 图片：
-  - `![](本地路径)` → 复制到 `static/images/posts/{slug}/` 并改写为 `/images/posts/{slug}/xxx.png`
-  - 外链图片保留
+### 6. 自动补齐英文版
 
-### 5. 写入目标
+读取刚写入的中文文件，生成 `{slug}.en.md`：
 
-| 语言 | 路径 |
-|------|------|
-| 中文 | `content/posts/{slug}.md` |
-| 英文 | `content/posts/{slug}.en.md`（仅用户提供英文稿或明确要求双语时） |
+1. **front matter**：`date`、`draft`、`tags` 与中文一致；`title`、`description`、`categories` 按 [reference-en.md](reference-en.md) 翻译
+2. **正文**：翻译段落/标题/列表；保留代码块、URL、图片路径、shortcode、`<!--more-->` 位置
+3. **已存在 `.en.md`**：中文有更新则同步覆盖英文（除非用户说保留旧英文）
 
-**禁止**使用 `.zh-cn.md` 后缀（默认语言用无后缀 `.md`）。
-
-### 6. 验证
+### 7. 验证
 
 ```bash
 cd /Users/simon/Documents/MyWebSite/MyBlog
 hugo build --minify --destination /tmp/hugo-blog-check
 ```
 
-失败则修复后重试，不要提交。
+失败则修复后重试，**不要 commit**。
 
-### 7. Git（可选）
+### 8. Git 提交并推送（默认）
 
-仅用户明确说「提交」「commit」「push」时执行。commit 格式：
+`hugo build` 成功后，除非用户说「本地测试」，否则**必须**执行：
 
+```bash
+cd /Users/simon/Documents/MyWebSite/MyBlog
+git status
+git diff
+git log --oneline -3
 ```
-feat(posts): 发布《{title}》
 
-- 新增文章 {slug}
+仅 stage 本次发布相关文件（`content/posts/`、图片、`static/images/posts/` 等），不要提交无关改动。
+
+```bash
+git add content/posts/{slug}.md content/posts/{slug}.en.md
+# 如有图片：git add static/images/posts/{slug}/ 等
+git commit -m "$(cat <<'EOF'
+feat(posts): 发布《{中文标题}》
+
+- 新增/更新 {slug} 中英文版本
+EOF
+)"
+git push origin main
+git status
 ```
+
+- push 成功后告知：GitHub 已更新，Cloudflare 将自动重新部署
+- push 失败：报告错误，不要重复 force push
 
 ## 用户交互
 
 | 情况 | 行为 |
 |------|------|
-| 未给 slug | 生成后告知用户，可修改 |
-| categories/tags 不确定 | 给出推断值，一行确认 |
-| 纯中文无英文版 | 只写 `.md`，不创建 `.en.md` |
-| 用户说「发布」 | `draft: false` + build 验证 |
+| 默认发布 | 中文 + 英文 + build + **commit + push** |
+| 「本地测试」 | 中文 + 英文 + build，**不** git |
+| 「仅中文」 | 只写 `.md`，仍默认 push |
+| 「只补英文不改中文」 | 只更新 `.en.md`，仍默认 push |
+| 未给 slug | 生成后告知 |
+| slug 已存在 | 询问覆盖或更新 |
 
 ## 快速命令
 
 ```bash
-# 辅助脚本（可选）
+# 仅填充中文 front matter（不翻译，手动场景）
 python3 scripts/fill-frontmatter.py drafts/my-article.md --slug my-article
 
-# 预览不写入
+# 预览
 python3 scripts/fill-frontmatter.py drafts/my-article.md --dry-run
 ```
 
+英文版由 Agent 翻译生成，不依赖脚本机翻。
+
 ## 示例
 
-**用户**：帮我把 `drafts/hugo-tips.md` 填充属性发布
+**用户**：把 `drafts/hugo-tips.md` 填充属性并发布
 
 **Agent**：
 
-1. 读取 `drafts/hugo-tips.md`
-2. 生成 front matter，`draft: false`
-3. 写入 `content/posts/hugo-tips.md`
-4. `hugo build` 验证
-5. 返回预览 URL：`/hugo-tips/`
+1. 读取草稿 → 写入中英文 posts
+2. `hugo build` 验证
+3. `git commit` + `git push origin main`
+4. 返回：`/hugo-tips/`、`/en/hugo-tips/`、GitHub 提交 hash
 
-**用户**：Obsidian 里 Blog/hugo-tips.md 填充属性，先不要发布
+**用户**：把 `drafts/hugo-tips.md` 本地测试一下
 
-**Agent**：同上，但 `draft: true`，不 git commit。
+**Agent**：
+
+1. 同上，但 `draft: true`（除非用户说发布）
+2. `hugo build` 验证
+3. **跳过 git**
+4. 返回本地预览地址
 
 ## 不要做的事
 
-- 不要擅自翻译整篇英文版
-- 不要修改 `hugo.toml` / 主题文件
-- 不要 `git push` 除非用户明确要求
-- 不要覆盖已有已发布文章，除非用户确认
+- 不要修改 `hugo.toml` / 主题文件（除非用户明确要求）
+- 不要 `git push --force`
+- 不要提交 `.env`、密钥、`public/`、`resources/`
+- 不要覆盖已发布英文版而不告知用户
+- 不要翻译代码块内容
+- 不要为中英文使用不同图片路径
