@@ -1,0 +1,273 @@
+baseURL = "https://example.org" # TODO: 部署前改为实际域名
+title = "Simon's Blog"
+theme = "LoveIt"
+
+defaultContentLanguage = "zh-cn"
+locale = "zh-CN"
+hasCJKLanguage = true
+enableEmoji = true
+enableRobotsTXT = true
+enableGitInfo = false
+copyright = "Simon"
+
+ignoreErrors = ["error-remote-getjson"]
+
+[caches]
+  [caches.images]
+    dir = ":cacheDir/images"
+
+[pagination]
+  pagerSize = 10
+  path = "page"
+
+[permalinks]
+  posts = ":contentbasename"
+
+[menu]
+  [[menu.main]]
+    weight = 1
+    identifier = "posts"
+    name = "所有文章"
+    url = "/posts/"
+  [[menu.main]]
+    weight = 2
+    identifier = "tags"
+    name = "标签"
+    url = "/tags/"
+  [[menu.main]]
+    weight = 3
+    identifier = "categories"
+    name = "分类"
+    url = "/categories/"
+  [[menu.main]]
+    weight = 4
+    identifier = "about"
+    name = "关于"
+    url = "/about/"
+
+[params]
+  defaultTheme = "auto"
+  dateFormat = "2006-01-02"
+  title = "Simon's Blog"
+  description = "Simon's 个人博客，记录代码与技术思考"
+  images = ["/images/avatar.png"]
+
+  [params.author]
+    name = "Simon"
+    email = "leeissonba@gmail.com"
+    link = "https://github.com/simonlee-hello"
+
+  [params.header]
+    desktopMode = "fixed"
+    mobileMode = "auto"
+    [params.header.title]
+      name = "Simon's Blog"
+
+  [params.footer]
+    enable = true
+    hugo = true
+    copyright = true
+    author = true
+    since = 2026
+
+  [params.section]
+    paginate = 20
+    dateFormat = "01-02"
+
+  [params.list]
+    paginate = 20
+    dateFormat = "01-02"
+
+  [params.app]
+    title = "Simon's Blog"
+    noFavicon = false
+    themeColor = "#ffffff"
+    iconColor = "#5bbad5"
+    tileColor = "#da532c"
+
+  [params.search]
+    enable = true
+    type = "fuse"
+    contentLength = 4000
+    maxResultLength = 10
+    snippetLength = 30
+    highlightTag = "em"
+    [params.search.fuse]
+      isCaseSensitive = false
+      minMatchCharLength = 2
+      findAllMatches = false
+      location = 0
+      threshold = 0.3
+      distance = 100
+      ignoreLocation = false
+
+  [params.home]
+    [params.home.profile]
+      enable = true
+      avatarURL = "/images/avatar.png"
+      title = ""
+      subtitle = "写代码、思考、重复。"
+      typeit = true
+      social = true
+    [params.home.posts]
+      enable = true
+      paginate = 6
+
+  [params.page]
+    hiddenFromHomePage = false
+    hiddenFromSearch = false
+    twemoji = false
+    lightgallery = false
+    ruby = true
+    fraction = true
+    fontawesome = true
+    [params.page.toc]
+      enable = true
+      keepStatic = false
+      auto = true
+    [params.page.code]
+      copy = true
+      maxShownLines = 50
+    [params.page.math]
+      enable = false
+    [params.page.mapbox]
+      enable = false
+    [params.page.share]
+      enable = true
+      Twitter = true
+      Facebook = true
+      Linkedin = true
+      Weibo = true
+      Telegram = true
+    [params.page.comment]
+      enable = false
+
+  [params.typeit]
+    speed = 100
+    cursorSpeed = 1000
+    cursorChar = "|"
+    duration = -1
+
+  [params.social]
+    GitHub = "simonlee-hello"
+    Email = "leeissonba@gmail.com"
+    RSS = true
+
+[sitemap]
+  changefreq = "weekly"
+  filename = "sitemap.xml"
+  priority = 0.5
+
+[markup]
+  [markup.highlight]
+    codeFences = true
+    lineNos = false
+    lineNumbersInTable = true
+    noClasses = true
+  [markup.goldmark]
+    [markup.goldmark.extensions]
+      definitionList = true
+      footnote = true
+      linkify = true
+      strikethrough = true
+      table = true
+      taskList = true
+      typographer = true
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 6
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+  page = ["HTML"]
+  section = ["HTML", "RSS"]
+  taxonomy = ["HTML", "RSS"]
+
+[languages]
+  [languages.zh-cn]
+    weight = 1
+    locale = "zh-CN"
+    label = "简体中文"
+    hasCJKLanguage = true
+    title = "Simon's Blog"
+    [languages.zh-cn.params]
+      title = "Simon's Blog"
+      description = "Simon's 个人博客，记录代码与技术思考"
+      [languages.zh-cn.params.home]
+        [languages.zh-cn.params.home.profile]
+          enable = true
+          avatarURL = "/images/avatar.png"
+          title = ""
+          subtitle = "写代码、思考、重复。"
+          typeit = true
+          social = true
+      [languages.zh-cn.params.social]
+        GitHub = "simonlee-hello"
+        Email = "leeissonba@gmail.com"
+        RSS = true
+    [languages.zh-cn.menu]
+      [[languages.zh-cn.menu.main]]
+        weight = 1
+        identifier = "posts"
+        name = "所有文章"
+        url = "/posts/"
+      [[languages.zh-cn.menu.main]]
+        weight = 2
+        identifier = "tags"
+        name = "标签"
+        url = "/tags/"
+      [[languages.zh-cn.menu.main]]
+        weight = 3
+        identifier = "categories"
+        name = "分类"
+        url = "/categories/"
+      [[languages.zh-cn.menu.main]]
+        weight = 4
+        identifier = "about"
+        name = "关于"
+        url = "/about/"
+
+  [languages.en]
+    weight = 2
+    locale = "en"
+    label = "English"
+    hasCJKLanguage = false
+    title = "Simon's Blog"
+    [languages.en.params]
+      title = "Simon's Blog"
+      description = "Simon's personal blog"
+      [languages.en.params.home]
+        [languages.en.params.home.profile]
+          enable = true
+          avatarURL = "/images/avatar.png"
+          title = ""
+          subtitle = "Code, think, repeat."
+          typeit = true
+          social = true
+      [languages.en.params.social]
+        GitHub = "simonlee-hello"
+        Email = "leeissonba@gmail.com"
+        RSS = true
+    [languages.en.menu]
+      [[languages.en.menu.main]]
+        weight = 1
+        identifier = "posts"
+        name = "Posts"
+        url = "/posts/"
+      [[languages.en.menu.main]]
+        weight = 2
+        identifier = "tags"
+        name = "Tags"
+        url = "/tags/"
+      [[languages.en.menu.main]]
+        weight = 3
+        identifier = "categories"
+        name = "Categories"
+        url = "/categories/"
+      [[languages.en.menu.main]]
+        weight = 4
+        identifier = "about"
+        name = "About"
+        url = "/about/"

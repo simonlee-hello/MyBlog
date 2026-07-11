@@ -1,0 +1,6 @@
+{
+  "name": "simons-blog",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Simon's Hugo blog - Cloudflare Workers build cache"
+}

@@ -1,0 +1,13 @@
+{
+  // Cloudflare Workers 静态站点部署
+  // 文档: https://gohugo.io/host-and-deploy/host-on-cloudflare/
+  "name": "simons-blog",
+  "compatibility_date": "2026-07-11",
+  "build": {
+    "command": "chmod a+x build.sh && ./build.sh"
+  },
+  "assets": {
+    "directory": "./public",
+    "not_found_handling": "404-page"
+  }
+}
