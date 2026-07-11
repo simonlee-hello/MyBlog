@@ -65,14 +65,34 @@ hugo new posts/my-new-post.md
    - **Project name**: `simons-blog`（或与 `wrangler.jsonc` 中 `name` 一致）
    - **Build command**: 留空
    - **Deploy command**: `npx wrangler deploy`
-   - **Advanced** → 环境变量：
+   - **Advanced** → **构建**环境变量（不是「变量和密钥」）：
      - `SKIP_DEPENDENCY_INSTALL` = `true`
-     - `HUGO_BASEURL` = `https://simons-blog.<你的子域>.workers.dev`（部署后按实际 URL 填写）
+     - `HUGO_BASEURL` = `https://blog.你的域名.com`（可选，见下方说明）
 5. 点击 **Deploy**，完成后访问站点
+
+> **注意**：纯静态 Worker **不能**在「Settings → Variables and Secrets（变量和密钥）」里加变量，那里是运行时用的。`HUGO_BASEURL` 要么在 **Settings → Build → Build variables（构建变量）** 里填，要么直接写进 `hugo.toml`（推荐）。
 
 ### 自定义域名
 
-在 Cloudflare Workers 项目 **Settings → Domains & Routes** 绑定域名后，同步更新 `hugo.toml` 的 `baseURL` 或 Cloudflare 环境变量 `HUGO_BASEURL`。
+1. Cloudflare → **Workers & Pages** → 项目 **simons-blog**
+2. **Settings → Domains & Routes** → **Add** → **Custom Domain**
+3. 输入例如 `blog.你的域名.com`（域名已在 Cloudflare 时会自动配 DNS）
+4. 把 `hugo.toml` 里的 `baseURL` 改成同一地址：
+
+```toml
+baseURL = "https://blog.你的域名.com/"
+```
+
+5. 提交并 push，触发重新部署
+
+**HUGO_BASEURL 填什么？** 填用户浏览器里访问博客的完整地址，例如：
+
+| 访问方式 | baseURL |
+|----------|---------|
+| 自定义域名 | `https://blog.example.com/` |
+| 临时 Workers 域名 | `https://simons-blog.xxxxx.workers.dev/` |
+
+**推荐做法**：直接改 `hugo.toml` 的 `baseURL`，不依赖 Cloudflare 环境变量，最简单。
 
 ### 构建缓存（可选）
 

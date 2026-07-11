@@ -1,4 +1,4 @@
-baseURL = "https://example.org" # TODO: 部署前改为实际域名
+baseURL = "https://blog.leeissonba.com" # TODO: 部署前改为实际域名
 title = "Simon's Blog"
 theme = "LoveIt"
 
