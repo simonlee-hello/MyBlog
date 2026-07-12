@@ -5,6 +5,8 @@ draft: false
 description: 'Notes from exploring AI tools for video generation and intelligent editing, including video-use, OpenMontage, Remotion, dots.tts, and HyperFrames.'
 categories: ['tech']
 tags: ['ai', 'video', 'openmontage', 'video-use']
+featuredImage: '/images/posts/ai-video-generation-editing-survey/featured.jpg'
+featuredImagePreview: '/images/posts/ai-video-generation-editing-survey/featured.jpg'
 ---
 
 I recently looked into AI for video generation and intelligent editing. This post records what I learned.
@@ -29,10 +31,16 @@ I mainly tried these open-source tools: video-use, OpenMontage, Remotion, dots.t
 
 Dependencies are relatively easy to set up. You can also ask your agent to install it with a prompt like:
 
-```
+```text
 Set up https://github.com/browser-use/video-use for me.
 
-Read install.md first to install this repo, wire up ffmpeg, register the skill with whichever agent you're running under, and set up the ElevenLabs API key — ask me to paste it when you need it. Then read SKILL.md for daily usage, and always read helpers/ because that's where the editing scripts live. After install, don't transcribe anything on your own — just tell me it's ready and wait for me to drop footage into a folder.
+Read install.md first to install this repo, wire up ffmpeg,
+register the skill with whichever agent you're running under,
+and set up the ElevenLabs API key — ask me to paste it when you need it.
+Then read SKILL.md for daily usage, and always read helpers/
+because that's where the editing scripts live.
+After install, don't transcribe anything on your own —
+just tell me it's ready and wait for me to drop footage into a folder.
 ```
 
 Manual install:
@@ -143,7 +151,7 @@ Projects land under `projects/`; finals under `exports/`.
 
 The resulting clip:
 
-<video controls src="/videos/posts/ai-video-generation-editing-survey/typhoon-formation-explainer.mp4"></video>
+<video controls playsinline preload="metadata" src="/videos/posts/ai-video-generation-editing-survey/typhoon-formation-explainer.mp4"></video>
 
 ### Takeaways
 

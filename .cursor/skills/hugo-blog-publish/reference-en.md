@@ -25,6 +25,8 @@ Page Bundle 与单文件模式均遵循：`index.md` ↔ `index.en.md`。
 | `description` | 中文摘要 | 英文摘要（非字面机翻腔） |
 | `tags` | 技术词保留英文：`hugo`, `loveit` | 与中文版一致（技术 tag 不翻译） |
 | `categories` | 见下表 | 见下表 |
+| `featuredImage` | 相同路径 | 相同路径 |
+| `featuredImagePreview` | 相同路径 | 相同路径 |
 
 ### categories 映射
 
@@ -43,16 +45,18 @@ Page Bundle 与单文件模式均遵循：`index.md` ↔ `index.en.md`。
 4. **语气**：技术博客风格，简洁准确，避免过度意译
 5. **结构**：段落数、列表层级与中文版一致
 
-## 媒体（图片 / 视频）
+## 媒体（图片 / 视频 / 配图）
 
 - 两语言**共用相同媒体路径**，不要为英文版再复制一份
 - 路径约定：
 
 | 类型 | static 目录 | URL |
 |------|-------------|-----|
-| 图片 | `static/images/posts/{slug}/` | `/images/posts/{slug}/...` |
+| 文章配图（封面） | `static/images/posts/{slug}/featured.jpg` | `/images/posts/{slug}/featured.jpg` |
+| 正文图片 | `static/images/posts/{slug}/` | `/images/posts/{slug}/...` |
 | 视频 | `static/videos/posts/{slug}/` | `/videos/posts/{slug}/...` |
 
+- **配图必填**：`featuredImage` + `featuredImagePreview`（通常同一文件），效果对齐 https://hugoloveit.com 首页宽幅封面
 - Page Bundle 内媒体只存一份，英文 `index.en.md` 引用同目录文件
 - 翻译时保留图片/视频路径与 `src`；可翻译 alt/caption
 
@@ -72,3 +76,5 @@ Page Bundle 与单文件模式均遵循：`index.md` ↔ `index.en.md`。
 - [ ] `<!--more-->` 两侧段落语义对应
 - [ ] 链接在 `/en/` 下可正常访问（站内链使用相对路径或 Hugo 内置链接）
 - [ ] 预览路径：`/{slug}/` 与 `/en/{slug}/`
+- [ ] 首页与文章页可见 `featuredImage` 配图
+- [ ] 中英文 `featuredImage` 路径一致

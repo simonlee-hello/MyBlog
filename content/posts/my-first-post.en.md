@@ -5,6 +5,8 @@ title: 'My First Post'
 description: 'Welcome to my new blog'
 categories: ['blog']
 tags: ['hugo', 'loveit']
+featuredImage: '/images/posts/my-first-post/featured.jpg'
+featuredImagePreview: '/images/posts/my-first-post/featured.jpg'
 ---
 
 Welcome to my new blog built with Hugo and LoveIt theme!

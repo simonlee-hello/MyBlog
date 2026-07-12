@@ -7,3 +7,36 @@
 .home-profile .home-avatar img {
   border-radius: 50%;
 }
+
+// 文章内：长代码不撑破容器；视频与正文同宽
+.single .content {
+  .code-block {
+    max-width: 100%;
+
+    .highlight {
+      overflow-x: auto;
+
+      pre,
+      code {
+        white-space: pre-wrap;
+        overflow-wrap: break-word;
+        word-break: normal;
+      }
+
+      span.line {
+        white-space: pre-wrap;
+        overflow-wrap: break-word;
+        word-break: normal;
+      }
+    }
+  }
+
+  video {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin: 1rem 0;
+    border-radius: .25rem;
+  }
+}
