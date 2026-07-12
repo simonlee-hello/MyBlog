@@ -46,6 +46,18 @@ make build
 hugo new posts/my-new-post.md
 ```
 
+## 评论系统（Giscus）
+
+本站使用 [Giscus](https://giscus.app/)（基于 GitHub Discussions）。配置在 `hugo.toml` 的 `[params.page.comment.giscus]`。
+
+前置条件：
+
+1. 仓库为 **Public**，并已开启 **Discussions**
+2. 安装 [giscus GitHub App](https://github.com/apps/giscus)，授权给 `simonlee-hello/MyBlog`
+3. 评论仅在 **production** 构建中加载（Cloudflare 部署已设 `HUGO_ENV=production`）
+
+单篇关闭评论：front matter 写 `comment: false`。
+
 ## 部署到 Cloudflare Workers
 
 参考 [Hugo 官方文档](https://gohugo.io/host-and-deploy/host-on-cloudflare/)，本项目已包含：

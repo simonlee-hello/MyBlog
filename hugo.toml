@@ -140,7 +140,38 @@ ignoreErrors = ["error-remote-getjson"]
       Weibo = true
       Telegram = true
     [params.page.comment]
-      enable = false
+      enable = true
+      # Giscus: https://giscus.app/ （需仓库开启 Discussions，并安装 giscus GitHub App）
+      [params.page.comment.disqus]
+        enable = false
+      [params.page.comment.gitalk]
+        enable = false
+      [params.page.comment.valine]
+        enable = false
+      [params.page.comment.facebook]
+        enable = false
+      [params.page.comment.telegram]
+        enable = false
+      [params.page.comment.commento]
+        enable = false
+      [params.page.comment.utterances]
+        enable = false
+      [params.page.comment.giscus]
+        enable = true
+        repo = "simonlee-hello/MyBlog"
+        repoId = "R_kgDOTVNnWg"
+        category = "Announcements"
+        categoryId = "DIC_kwDOTVNnWs4DBC6N"
+        lang = ""
+        mapping = "pathname"
+        reactionsEnabled = "1"
+        emitMetadata = "0"
+        inputPosition = "bottom"
+        lazyLoading = false
+        lightTheme = "light"
+        darkTheme = "dark"
+      [params.page.comment.waline]
+        enable = false
 
   [params.typeit]
     speed = 100
