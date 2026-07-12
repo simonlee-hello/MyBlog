@@ -1,6 +1,7 @@
 # Hugo
 /public/
 /resources/
+/drafts/
 .hugo_build.lock
 .cache/
 

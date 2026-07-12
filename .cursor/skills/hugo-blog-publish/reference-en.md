@@ -43,10 +43,18 @@ Page Bundle 与单文件模式均遵循：`index.md` ↔ `index.en.md`。
 4. **语气**：技术博客风格，简洁准确，避免过度意译
 5. **结构**：段落数、列表层级与中文版一致
 
-## 图片
+## 媒体（图片 / 视频）
 
-- 两语言**共用相同图片路径**（相对路径或 `/images/...`），不要复制图片
-- Page Bundle 内图片只存一份，英文 `index.en.md` 引用同目录文件
+- 两语言**共用相同媒体路径**，不要为英文版再复制一份
+- 路径约定：
+
+| 类型 | static 目录 | URL |
+|------|-------------|-----|
+| 图片 | `static/images/posts/{slug}/` | `/images/posts/{slug}/...` |
+| 视频 | `static/videos/posts/{slug}/` | `/videos/posts/{slug}/...` |
+
+- Page Bundle 内媒体只存一份，英文 `index.en.md` 引用同目录文件
+- 翻译时保留图片/视频路径与 `src`；可翻译 alt/caption
 
 ## 同步策略
 
