@@ -1,0 +1,43 @@
+{{- /* 不蒜子访问统计：https://busuanzi.ibruce.info/ */ -}}
+{{- /* 参考：https://stilig.me/posts/hugo-adds-busuanzi/ */ -}}
+{{- if .params.enable -}}
+    {{- if eq .bsz_type "footer" -}}
+        {{- /* 脚本只在 footer 加载一次，避免重复计数 */ -}}
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    {{- end -}}
+
+    {{- if or .params.site_pv .params.site_uv .params.page_pv -}}
+        {{- if eq .bsz_type "footer" -}}
+            <div class="footer-line busuanzi">
+                {{- if .params.site_pv -}}
+                    <span id="busuanzi_container_site_pv" style="display: none;">
+                        {{- with .params.site_pv_pre -}}{{ . | safeHTML }}{{ end -}}
+                        <span id="busuanzi_value_site_pv"></span>
+                        {{- with .params.site_pv_post -}}{{ . | safeHTML }}{{ end -}}
+                    </span>
+                {{- end -}}
+
+                {{- if and .params.site_pv .params.site_uv -}}
+                    &nbsp;|&nbsp;
+                {{- end -}}
+
+                {{- if .params.site_uv -}}
+                    <span id="busuanzi_container_site_uv" style="display: none;">
+                        {{- with .params.site_uv_pre -}}{{ . | safeHTML }}{{ end -}}
+                        <span id="busuanzi_value_site_uv"></span>
+                        {{- with .params.site_uv_post -}}{{ . | safeHTML }}{{ end -}}
+                    </span>
+                {{- end -}}
+            </div>
+        {{- end -}}
+
+        {{- /* 单页阅读量仅在文章 meta 区显示 */ -}}
+        {{- if and .params.page_pv (eq .bsz_type "page-reading") -}}
+            <span id="busuanzi_container_page_pv" style="display: none;">
+                {{- with .params.page_pv_pre -}}{{ . | safeHTML }}{{ end -}}
+                <span id="busuanzi_value_page_pv"></span>&nbsp;{{- T "views" -}}
+                {{- with .params.page_pv_post -}}{{ . | safeHTML }}{{ end -}}
+            </span>
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
