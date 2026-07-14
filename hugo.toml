@@ -44,9 +44,14 @@ ignoreErrors = ["error-remote-getjson"]
     identifier = "about"
     name = "关于"
     url = "/about/"
+  [[menu.main]]
+    weight = 5
+    identifier = "niche-radar"
+    name = "赛道雷达"
+    url = "/tools/niche-radar/"
 
 [params]
-  defaultTheme = "auto"
+  defaultTheme = "dark"
   dateFormat = "2006-01-02"
   title = "Simon's Blog"
   description = "Simon's 个人博客，记录代码与技术思考"
@@ -96,7 +101,7 @@ ignoreErrors = ["error-remote-getjson"]
   [params.app]
     title = "Simon's Blog"
     noFavicon = false
-    themeColor = "#ffffff"
+    themeColor = "#0c1118"
     iconColor = "#5bbad5"
     tileColor = "#da532c"
 
@@ -274,6 +279,11 @@ ignoreErrors = ["error-remote-getjson"]
         identifier = "about"
         name = "关于"
         url = "/about/"
+      [[languages.zh-cn.menu.main]]
+        weight = 5
+        identifier = "niche-radar"
+        name = "赛道雷达"
+        url = "/tools/niche-radar/"
 
   [languages.en]
     weight = 2
@@ -317,3 +327,8 @@ ignoreErrors = ["error-remote-getjson"]
         identifier = "about"
         name = "About"
         url = "/about/"
+      [[languages.en.menu.main]]
+        weight = 5
+        identifier = "niche-radar"
+        name = "Niche Radar"
+        url = "/tools/niche-radar/"

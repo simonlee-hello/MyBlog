@@ -1,8 +1,23 @@
 // ==============================
 // Override Variables
-// 覆盖 LoveIt 主题变量
+// 对齐赛道雷达深色氛围
 // ==============================
 
-// 主色调，可按个人品牌调整
-// $global-font-color: #34495e;
-// $global-link-color: #3273dc;
+$global-background-color-dark: #0c1118;
+$global-font-color-dark: #e8eef7;
+$global-font-secondary-color-dark: #8b9bb0;
+$global-link-color-dark: #c6d3e3;
+$global-link-hover-color-dark: #5eead4;
+$global-border-color-dark: rgba(232, 238, 247, 0.12);
+
+$header-background-color-dark: rgba(12, 17, 24, 0.86);
+$header-hover-color-dark: #ff6a3d;
+
+$search-background-color-dark: #141b25;
+
+$table-background-color-dark: #141b25;
+$code-background-color-dark: #141b25;
+
+$selection-color-dark: rgba(255, 106, 61, 0.28);
+$scrollbar-color: #5a6575;
+$scrollbar-hover-color: #8b9bb0;

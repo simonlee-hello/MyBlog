@@ -1,0 +1,18 @@
+{
+  "name": "赛道雷达",
+  "short_name": "赛道雷达",
+  "description": "自媒体 Niche 定位测评：通过选择题匹配可执行赛道建议",
+  "start_url": "/tools/niche-radar/",
+  "display": "standalone",
+  "background_color": "#0c1118",
+  "theme_color": "#0c1118",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
