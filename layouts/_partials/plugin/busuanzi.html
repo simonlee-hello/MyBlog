@@ -1,9 +1,10 @@
-{{- /* 不蒜子访问统计：https://busuanzi.ibruce.info/ */ -}}
-{{- /* 参考：https://stilig.me/posts/hugo-adds-busuanzi/ */ -}}
+{{- /* 前台访问统计：Vercount（兼容不蒜子 span id） */ -}}
+{{- /* https://github.com/EvanNotFound/vercount */ -}}
+{{- /* 不蒜子依赖 Referer，现代浏览器/Safari 会导致全站 page_pv 共用；Vercount 用 POST 传完整 URL */ -}}
 {{- if .params.enable -}}
     {{- if eq .bsz_type "footer" -}}
         {{- /* 脚本只在 footer 加载一次，避免重复计数 */ -}}
-        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <script defer src="https://cn.vercount.one/js"></script>
     {{- end -}}
 
     {{- if or .params.site_pv .params.site_uv .params.page_pv -}}

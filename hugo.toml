@@ -75,8 +75,8 @@ ignoreErrors = ["error-remote-getjson"]
     author = true
     since = 2026
 
-  # 不蒜子前台计数：页脚全站 PV/UV + 文章阅读量
-  # https://busuanzi.ibruce.info/  参考 https://stilig.me/posts/hugo-adds-busuanzi/
+  # 前台计数：Vercount（兼容不蒜子 span id；POST 传 URL，避免 Referer 导致各文共用计数）
+  # https://github.com/EvanNotFound/vercount
   [params.busuanzi]
     enable = true
     site_uv = true
