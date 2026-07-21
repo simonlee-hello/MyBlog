@@ -35,7 +35,7 @@ toc:
 
 红队外带、应急里抽关键证据、运维「只捞某目录某类文件」——本质都是**选择性外带**，不是备份，也不是全盘取证。
 
-Fdoc 就是按这个场景做的：在目标上筛、打包、（可选）传、（可选）把链接回传到接收端、（可选）清理。
+[Fdoc](https://github.com/simonlee-hello/Fdoc) 就是按这个场景做的：在目标上筛、打包、（可选）传、（可选）把链接回传到接收端、（可选）清理。
 
 ## 2. 解决什么痛点
 
@@ -162,7 +162,7 @@ Fdoc -d /data -e pdf,docx -t 2025-01-01 -o /tmp/docs.tgz \
   -scrub -q
 ```
 
-DNS 分片格式、加密磁盘占用、Windows SkipDirs 等细节以发行说明 / 仓库 README 为准。
+DNS 分片格式、加密磁盘占用、Windows SkipDirs 等细节见 [Fdoc 仓库 README](https://github.com/simonlee-hello/Fdoc)。
 
 ## 6. 终端演示
 

