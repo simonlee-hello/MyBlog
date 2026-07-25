@@ -46,9 +46,6 @@
                     <span class="icp">{{ . | safeHTML }}</span>
                 {{- end -}}
             </div>
-
-            {{- /* busuanzi: 全站 PV / UV */ -}}
-            {{- partial "plugin/busuanzi.html" (dict "params" .Site.Params.busuanzi "bsz_type" "footer") -}}
         </div>
     </footer>
 {{- end -}}

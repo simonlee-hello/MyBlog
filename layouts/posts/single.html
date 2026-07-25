@@ -53,9 +53,7 @@
                     <i class="far fa-calendar-alt" aria-hidden="true"></i>&nbsp;<time datetime="{{ . }}">{{ . }}</time>&nbsp;
                 {{- end -}}
                 <i class="fas fa-pencil-alt" aria-hidden="true"></i>&nbsp;{{ T "wordCount" .WordCount }}&nbsp;
-                <i class="far fa-clock" aria-hidden="true"></i>&nbsp;{{ T "readingTime" .ReadingTime }}&nbsp;
-                {{- /* busuanzi: 单页阅读量 */ -}}
-                {{- partial "plugin/busuanzi.html" (dict "params" .Site.Params.busuanzi "bsz_type" "page-reading") -}}
+                <i class="far fa-clock" aria-hidden="true"></i>&nbsp;{{ T "readingTime" .ReadingTime }}
             </div>
         </div>
 

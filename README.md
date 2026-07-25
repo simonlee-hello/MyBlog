@@ -58,14 +58,9 @@ hugo new posts/my-new-post.md
 
 单篇关闭评论：front matter 写 `comment: false`。
 
-## 访问统计（不蒜子）
+## 访问统计
 
-前台显示用 [不蒜子](https://busuanzi.ibruce.info/)（与 Cloudflare Web Analytics 互不冲突）：
-
-- **页脚**：全站浏览量（PV）/ 访客数（UV）
-- **文章 meta**：本文阅读量
-
-配置：`hugo.toml` → `[params.busuanzi]`。关闭：`enable = false`。
+站长后台用 [Cloudflare Web Analytics](https://dash.cloudflare.com/)（按 Host 过滤 `blog.` 子域即可）。前台阅读量/访客数曾接不蒜子/Vercount，因第三方计数会丢数重置，已移除。
 
 ## 部署到 Cloudflare Workers
 

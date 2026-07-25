@@ -28,7 +28,7 @@ description: >-
 | 配图 | `static/images/posts/{slug}/featured.jpg` + front matter `featuredImage` |
 | 视频 | `static/videos/posts/{slug}/` 或 `bilibili` shortcode |
 | 评论 | Giscus（`params.page.comment.giscus`），仅 **production** 环境加载 |
-| 前台计数 | 不蒜子（`params.busuanzi`）：页脚全站 PV/UV + 文章阅读量 |
+| 访问统计 | Cloudflare Web Analytics（站长后台）；前台 PV/UV 已移除 |
 | 自定义样式 | `assets/css/_custom.scss`（勿改 themes/LoveIt） |
 | 主题覆盖 | 项目 `layouts/` 覆盖主题 partial（已修 Hugo 弃用 API） |
 
@@ -196,19 +196,9 @@ Markdown 里 `\(` `\[` 等易被 Hugo 吃掉时，用 `raw` shortcode 包公式�
 4. 单篇关闭：`comment: false`
 5. 评论数据在 GitHub Discussions 中管理
 
-## 前台计数（不蒜子）
+## 访问统计
 
-配置 `[params.busuanzi]`。实现参考 [stilig 文章](https://stilig.me/posts/hugo-adds-busuanzi/)：
-
-| 位置 | 内容 |
-|------|------|
-| 页脚 | 全站 PV / UV（`site_pv` / `site_uv`） |
-| 文章 meta | 本文阅读量（`page_pv`） |
-
-模板：`layouts/_partials/plugin/busuanzi.html`，脚本只在 footer 加载一次。  
-与 Cloudflare Web Analytics（站长后台）互补，不互相替代。
-
-**坑**：不蒜子依赖 Referer，现代浏览器（尤其 Safari）会导致各文 `page_pv` 共用。本站已改用 [Vercount](https://github.com/EvanNotFound/vercount)（`layouts/_partials/plugin/busuanzi.html` 加载 `cn.vercount.one/js`，仍用原 busuanzi span id）。
+站长后台：Cloudflare Web Analytics。前台不蒜子/Vercount 因第三方数据会重置，已移除，勿再接入同类免费计数。
 
 ## 与 hugo-blog-publish 的分工
 
