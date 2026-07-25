@@ -10,6 +10,13 @@
             {{- .Site.Params.description | default .Site.Title -}}
         </description>
         <generator>Hugo -- gohugo.io</generator>
+        {{- /* 订阅源图标：阅读器用 channel/image，需绝对 URL */ -}}
+        {{- $icon := .Site.Params.home.profile.avatarURL | default (index (.Site.Params.images | default slice) 0) | default "/images/avatar.png" -}}
+        <image>
+            <url>{{ $icon | absURL }}</url>
+            <title>{{ .Site.Title }}</title>
+            <link>{{ .Permalink }}</link>
+        </image>
         {{- with .Site.Language.Locale -}}
             <language>
                 {{- . -}}

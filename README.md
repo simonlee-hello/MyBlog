@@ -65,7 +65,8 @@ hugo new posts/my-new-post.md
 
 顶栏与首页 Profile 均有 RSS 图标（`params.social.RSS = true`）。  
 全文输出：`params.page.rssFullText = true`。  
-图片：`layouts/_partials/rss/item.html` 将配图/正文图改为绝对 URL（阅读器无法加载相对路径与 lazyload 占位图）。
+图片：`layouts/_partials/rss/item.html` 将配图/正文图改为绝对 URL（阅读器无法加载相对路径与 lazyload 占位图）。  
+订阅源图标：`layouts/home.rss.xml` 的 `<image>` + `static/favicon*`（此前 favicon 404）。
 
 ## 访问统计
 
