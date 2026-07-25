@@ -128,6 +128,8 @@ ignoreErrors = ["error-remote-getjson"]
     ruby = true
     fraction = true
     fontawesome = true
+    # RSS 输出全文（false 时仅摘要）
+    rssFullText = true
     [params.page.toc]
       enable = true
       keepStatic = false

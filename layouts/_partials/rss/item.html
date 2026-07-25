@@ -1,0 +1,47 @@
+{{- /* 覆盖主题 RSS item：全文 + 绝对路径图片（阅读器无法加载相对 URL / lazyload 占位图） */ -}}
+{{- $params := .Page.Params | merge .Site.Params.Page | merge (dict "author" .Site.Params.Author) -}}
+{{- $base := strings.TrimSuffix "/" .Site.BaseURL -}}
+<item>
+    <title>
+        {{- .Page.Title -}}
+    </title>
+    <link>
+        {{- .Page.Permalink -}}
+    </link>
+    <pubDate>
+        {{- .Page.Date.Format "Mon, 02 Jan 2006 15:04:05 -0700"  -}}
+    </pubDate>
+    <author>
+      {{- with .Site.Params.Author.email -}}
+        {{- . }}{{ with $.Site.Params.Author.name }} ({{ . }}){{ end -}}
+      {{- else -}}
+        {{- with $.Site.Params.Author.name }}{{ . }}{{ end -}}
+      {{- end -}}
+    </author>
+    <guid>
+        {{- .Page.Permalink -}}
+    </guid>
+    <description>
+        {{- "<![CDATA[" | safeHTML -}}
+        {{- with $params.featuredimage -}}
+            <div class="featured-image">
+                <img src="{{ . | absURL }}" alt="{{ $.Page.Title }}" referrerpolicy="no-referrer">
+            </div>
+        {{- end -}}
+        {{- $content := .Page.Description -}}
+        {{- if $params.rssFullText -}}
+            {{- $content = dict "Content" .Page.Content "Ruby" $params.ruby "Fraction" $params.fraction "Fontawesome" $params.fontawesome | partial "function/content.html" -}}
+        {{- else -}}
+            {{- with .Page.Summary -}}
+                {{- $content = dict "Content" . "Ruby" $params.ruby "Fraction" $params.fraction "Fontawesome" $params.fontawesome | partial "function/content.html" -}}
+            {{- end -}}
+        {{- end -}}
+        {{- /* lazyload：用 data-src 真实地址替换整张 img，并改为绝对 URL */ -}}
+        {{- $content = $content | replaceRE `<img\b[^>]*?\bdata-src="(/[^"]+)"[^>]*/?\s*>` (printf `<img src="%s$1" alt="" referrerpolicy="no-referrer">` $base) -}}
+        {{- /* 其余相对路径 src（含封面未命中 data-src 的情况） */ -}}
+        {{- $content = $content | replaceRE `src="(/[^/"][^"]*)"` (printf `src="%s$1"` $base) -}}
+        {{- $content = $content | replaceRE `src='(/[^/'][^']*)'` (printf `src='%s$1'` $base) -}}
+        {{- $content | safeHTML -}}
+        {{- "]]>" | safeHTML -}}
+    </description>
+</item>

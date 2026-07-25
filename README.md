@@ -63,7 +63,9 @@ hugo new posts/my-new-post.md
 - 中文：https://blog.leeissonba.com/index.xml
 - 英文：https://blog.leeissonba.com/en/index.xml
 
-顶栏与首页 Profile 均有 RSS 图标（`params.social.RSS = true`）。
+顶栏与首页 Profile 均有 RSS 图标（`params.social.RSS = true`）。  
+全文输出：`params.page.rssFullText = true`。  
+图片：`layouts/_partials/rss/item.html` 将配图/正文图改为绝对 URL（阅读器无法加载相对路径与 lazyload 占位图）。
 
 ## 访问统计
 
