@@ -58,6 +58,13 @@ hugo new posts/my-new-post.md
 
 单篇关闭评论：front matter 写 `comment: false`。
 
+## RSS 订阅
+
+- 中文：https://blog.leeissonba.com/index.xml
+- 英文：https://blog.leeissonba.com/en/index.xml
+
+顶栏与首页 Profile 均有 RSS 图标（`params.social.RSS = true`）。
+
 ## 访问统计
 
 站长后台用 [Cloudflare Web Analytics](https://dash.cloudflare.com/)（按 Host 过滤 `blog.` 子域即可）。前台阅读量/访客数曾接不蒜子/Vercount，因第三方计数会丢数重置，已移除。

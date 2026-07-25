@@ -8,6 +8,16 @@
   border-radius: 50%;
 }
 
+// 首页社交图标（含 RSS）提高可见度
+.home-profile .links a {
+  margin: 0 .35rem;
+  opacity: .85;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
 // 文章内：长代码不撑破容器；视频与正文同宽
 .single .content {
   .code-block {

@@ -54,6 +54,12 @@
                         </span>
                     </span>
                 {{- end -}}
+                {{- /* RSS：顶栏常驻入口（首页 Profile 社交区也有） */ -}}
+                {{- with .Site.Home.OutputFormats.Get "RSS" -}}
+                    <a href="{{ .RelPermalink }}" class="menu-item" title="RSS" target="_blank" rel="noopener noreferrer alternate" type="application/rss+xml">
+                        <i class="fas fa-rss" aria-hidden="true"></i>
+                    </a>
+                {{- end -}}
                 <a href="javascript:void(0);" class="menu-item theme-switch" title="{{ T "switchTheme" }}">
                     <i class="fas fa-adjust" aria-hidden="true"></i>
                 </a>
@@ -144,6 +150,11 @@
                 {{- end -}}
                 <a class="menu-item" href="{{ $url }}" title="{{ .Title }}"{{ if (urls.Parse $url).Host }} rel="noopener noreffer" target="_blank"{{ end }}>
                     {{- .Pre | safeHTML }}{{ .Name }}{{ .Post | safeHTML -}}
+                </a>
+            {{- end -}}
+            {{- with .Site.Home.OutputFormats.Get "RSS" -}}
+                <a href="{{ .RelPermalink }}" class="menu-item" title="RSS" target="_blank" rel="noopener noreferrer alternate" type="application/rss+xml">
+                    <i class="fas fa-rss" aria-hidden="true"></i>
                 </a>
             {{- end -}}
             <a href="javascript:void(0);" class="menu-item theme-switch" title="{{ T "switchTheme" }}">

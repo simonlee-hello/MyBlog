@@ -107,6 +107,8 @@ ignoreErrors = ["error-remote-getjson"]
       ignoreLocation = false
 
   [params.home]
+    # 首页 RSS 条目数（/index.xml）
+    rss = 20
     [params.home.profile]
       enable = true
       avatarURL = "/images/avatar.png"
