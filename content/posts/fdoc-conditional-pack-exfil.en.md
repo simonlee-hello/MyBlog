@@ -168,10 +168,10 @@ DNS shard format, encryption disk use, Windows SkipDirs, and related details: se
 
 Four clips cover the main path: size estimate → filtered pack → pinned-backend upload → upload with webhook callback.
 
-{{< image src="/images/posts/fdoc-conditional-pack-exfil/01-size.gif" caption="Size estimate (`-size`)" >}}
+{{< image src="/images/posts/fdoc-conditional-pack-exfil/01-size.gif" caption="Size estimate (`-size`)" width="100%" >}}
 
-{{< image src="/images/posts/fdoc-conditional-pack-exfil/02-filter-pack.gif" caption="Multi-condition filter then pack" >}}
+{{< image src="/images/posts/fdoc-conditional-pack-exfil/02-filter-pack.gif" caption="Multi-condition filter then pack" width="100%" >}}
 
-{{< image src="/images/posts/fdoc-conditional-pack-exfil/03-upload.gif" caption="Upload (`-b lit`)" >}}
+{{< image src="/images/posts/fdoc-conditional-pack-exfil/03-upload.gif" caption="Upload (`-b lit`)" width="100%" >}}
 
-{{< image src="/images/posts/fdoc-conditional-pack-exfil/04-upload-webhook.gif" caption="Upload + webhook callback" >}}
+{{< image src="/images/posts/fdoc-conditional-pack-exfil/04-upload-webhook.gif" caption="Upload + webhook callback" width="100%" >}}

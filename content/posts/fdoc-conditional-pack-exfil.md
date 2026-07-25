@@ -168,10 +168,10 @@ DNS 分片格式、加密磁盘占用、Windows SkipDirs 等细节见 [Fdoc 仓�
 
 下面四段演示覆盖主路径：估大小 → 多条件筛选打包 → 指定渠道上传 → 上传并 webhook 回传。
 
-{{< image src="/images/posts/fdoc-conditional-pack-exfil/01-size.gif" caption="估大小（`-size`）" >}}
+{{< image src="/images/posts/fdoc-conditional-pack-exfil/01-size.gif" caption="估大小（`-size`）" width="100%" >}}
 
-{{< image src="/images/posts/fdoc-conditional-pack-exfil/02-filter-pack.gif" caption="多条件筛选后打包" >}}
+{{< image src="/images/posts/fdoc-conditional-pack-exfil/02-filter-pack.gif" caption="多条件筛选后打包" width="100%" >}}
 
-{{< image src="/images/posts/fdoc-conditional-pack-exfil/03-upload.gif" caption="上传（`-b lit`）" >}}
+{{< image src="/images/posts/fdoc-conditional-pack-exfil/03-upload.gif" caption="上传（`-b lit`）" width="100%" >}}
 
-{{< image src="/images/posts/fdoc-conditional-pack-exfil/04-upload-webhook.gif" caption="上传 + webhook 回传" >}}
+{{< image src="/images/posts/fdoc-conditional-pack-exfil/04-upload-webhook.gif" caption="上传 + webhook 回传" width="100%" >}}
