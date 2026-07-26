@@ -26,6 +26,11 @@
 
           applyTheme();
           query.addEventListener('change', applyTheme);
+
+          (function applyListView() {
+            const view = window.localStorage?.getItem('list-view') || 'list';
+            document.body.setAttribute('data-list-view', view === 'grid' ? 'grid' : 'list');
+          })();
         </script>
 
         <div id="mask"></div>
@@ -57,5 +62,33 @@
 
         {{- /* Load JavaScript scripts and CSS */ -}}
         {{- partial "assets.html" . -}}
+
+        <script>
+          (function () {
+            const KEY = 'list-view';
+            function syncIcons(view) {
+              document.querySelectorAll('.list-view-switch i').forEach(function (icon) {
+                icon.className = view === 'grid' ? 'fas fa-list' : 'fas fa-th-large';
+              });
+              document.querySelectorAll('.list-view-switch').forEach(function (btn) {
+                btn.title = view === 'grid' ? '切换到列表' : '切换到网格';
+              });
+            }
+            function setView(view) {
+              const next = view === 'grid' ? 'grid' : 'list';
+              document.body.setAttribute('data-list-view', next);
+              try { window.localStorage.setItem(KEY, next); } catch (e) {}
+              syncIcons(next);
+            }
+            syncIcons(document.body.getAttribute('data-list-view') || 'list');
+            document.querySelectorAll('.list-view-switch').forEach(function (btn) {
+              btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                const cur = document.body.getAttribute('data-list-view') || 'list';
+                setView(cur === 'grid' ? 'list' : 'grid');
+              });
+            });
+          })();
+        </script>
     </body>
 </html>

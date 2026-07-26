@@ -102,3 +102,187 @@ body[theme="dark"] .home-profile {
 body[theme="dark"] a:hover {
   color: #5eead4;
 }
+
+// ---------- 列表 / B 站风格网格切换 ----------
+body[data-list-view="list"] .grid-only {
+  display: none;
+}
+
+body[data-list-view="list"] .featured-image-preview.is-placeholder {
+  display: none;
+}
+
+body[data-list-view="grid"] .list-only {
+  display: none;
+}
+
+body[data-list-view="grid"] {
+  // 覆盖 LoveIt .page 的百分比窄宽，让网格随视口铺开
+  .page.home,
+  .page.archive {
+    width: unquote('min(1480px, calc(100% - 2.5rem))');
+    max-width: none;
+  }
+
+  .home .post-list,
+  .archive .post-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.25rem 1rem;
+    margin-top: 1rem;
+    width: 100%;
+  }
+
+  .archive .post-list > .grid-only {
+    display: contents;
+  }
+
+  .post-list .summary {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: .5rem;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.72);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    transition: transform .2s ease, box-shadow .2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .featured-image-preview {
+      width: 100%;
+      padding: 0;
+      margin: 0;
+      aspect-ratio: 16 / 9;
+      border-radius: .5rem .5rem 0 0;
+      overflow: hidden;
+      background: linear-gradient(135deg, #dbe4f0 0%, #c5d0de 100%);
+
+      a {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      img {
+        position: static;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      &:hover {
+        transform: none;
+      }
+
+      &.is-placeholder a::after {
+        content: "";
+        display: block;
+        width: 100%;
+        height: 100%;
+        background:
+          radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.55), transparent 55%),
+          linear-gradient(135deg, #9aa8bc 0%, #6d7c90 100%);
+      }
+    }
+
+    .single-title {
+      font-size: .95rem;
+      line-height: 1.4;
+      margin: .55rem .7rem .25rem;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+
+      a {
+        color: inherit;
+      }
+    }
+
+    .post-meta {
+      margin: 0 .7rem .7rem;
+      font-size: .75rem;
+      color: #8a9199;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .15rem .35rem;
+      align-items: center;
+
+      .post-category {
+        display: none;
+      }
+
+      .post-publish {
+        margin-left: auto;
+        white-space: nowrap;
+      }
+    }
+
+    .content,
+    .post-footer {
+      display: none;
+    }
+  }
+}
+
+body[theme="dark"][data-list-view="grid"] .post-list .summary {
+  background: rgba(22, 30, 42, 0.72);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(232, 238, 247, 0.06);
+
+  &:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+    border-color: rgba(94, 234, 212, 0.2);
+  }
+
+  .featured-image-preview {
+    background: linear-gradient(135deg, #1a2433 0%, #0f1620 100%);
+
+    &.is-placeholder a::after {
+      background:
+        radial-gradient(circle at 30% 30%, rgba(94, 234, 212, 0.18), transparent 55%),
+        linear-gradient(135deg, #243044 0%, #15202e 100%);
+    }
+  }
+
+  .post-meta {
+    color: #8b95a5;
+  }
+}
+
+@media (max-width: 960px) {
+  body[data-list-view="grid"] {
+    .page.home,
+    .page.archive {
+      width: unquote('min(960px, calc(100% - 1.5rem))');
+    }
+
+    .home .post-list,
+    .archive .post-list {
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1rem .75rem;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  body[data-list-view="grid"] {
+    .page.home,
+    .page.archive {
+      width: calc(100% - 1rem);
+    }
+
+    .home .post-list,
+    .archive .post-list {
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: .85rem .65rem;
+    }
+  }
+}

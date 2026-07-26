@@ -70,7 +70,7 @@ ignoreErrors = ["error-remote-getjson"]
 
   [params.footer]
     enable = true
-    hugo = true
+    hugo = false
     copyright = true
     author = true
     since = 2026
