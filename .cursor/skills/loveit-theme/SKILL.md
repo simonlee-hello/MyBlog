@@ -132,6 +132,16 @@ comment:
 
 需灯箱时 front matter 设 `lightgallery: true`（或站点默认开启）。
 
+### GIF / 演示动图（与正文同宽）
+
+LoveIt 正文 `figure img` **不会**默认拉满栏宽，会按 GIF 像素宽显示。演示类 GIF **必须**加 `width="100%"`：
+
+```markdown
+{{< image src="/images/posts/{slug}/demo.gif" caption="说明" width="100%" >}}
+```
+
+中英文 shortcode 参数保持一致（含 `width`）。普通静态截图不强制。
+
 ### Bilibili
 
 ```markdown
@@ -139,13 +149,13 @@ comment:
 {{< bilibili id=BV1TJ411C7An p=3 >}}
 ```
 
-### 本地视频
+### 本地视频（与正文同宽）
 
 ```html
 <video controls playsinline preload="metadata" src="/videos/posts/{slug}/demo.mp4"></video>
 ```
 
-宽度由 `_custom.scss` 约束为内容区 100%。
+宽度由 `_custom.scss` 约束为内容区 100%；发布时仍须用上述 `<video>` 写法，不要改成仅 Markdown 链接。
 
 ### 代码
 

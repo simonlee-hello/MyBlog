@@ -22,6 +22,12 @@
 {{< image src="/images/posts/slug/a.png" caption="说明" title="悬停标题" >}}
 ```
 
+**GIF / 演示动图**（与正文同宽，必加 `width`）：
+
+```markdown
+{{< image src="/images/posts/slug/demo.gif" caption="说明" width="100%" >}}
+```
+
 常用参数：`src` `alt` `caption` `title` `width` `height` `src_s` `src_l` `linked`
 
 配合 front matter `lightgallery: true`。
@@ -122,8 +128,9 @@ Emoji：可用原生 Unicode，或见 [Emoji Support](https://hugoloveit.com/emo
 |----------|------|
 | 「注意/提示」段落 | `admonition` |
 | 需要灯箱的配图 | `image` + `lightgallery: true` |
+| **GIF / 演示动图** | `image` + **`width="100%"`**（与正文同宽） |
 | Bilibili URL | `bilibili` |
 | YouTube URL | `youtube` |
-| 本地 mp4 | `<video controls …>` |
+| 本地 mp4 / webm | `<video controls playsinline …>`（与正文同宽） |
 | 架构/流程说明 | `mermaid` 围栏或 shortcode |
 | 重要外链需 title | `link` |

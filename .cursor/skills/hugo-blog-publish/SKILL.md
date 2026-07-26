@@ -49,12 +49,15 @@ description: 为 Hugo LoveIt 博客填充 front matter、发布中文文章、�
 | 注意/提示/警告段落 | `admonition` |
 | Bilibili 链接 | `bilibili` shortcode |
 | 需灯箱的图 | `image` shortcode，必要时 `lightgallery: true` |
+| **GIF / 演示动图** | `image` + **`width="100%"`**（与正文同宽，必做） |
 | 流程/架构图 | `mermaid` |
-| 本地视频 | `<video controls playsinline …>` |
+| 本地视频 | `<video controls playsinline …>`（与正文同宽，见下） |
 | 公式文 | 单篇 `math.enable: true`，必要时 `raw` |
 | 冗长/宣传腔正文 | 按 loveit-theme「正文风格：干货优先」精简 |
 
 中英文 shortcode **结构保持一致**（只翻译 shortcode 内可见文案，如 admonition 标题/正文）。写作默认遵循 loveit-theme 的干货优先准则。
+
+**媒体宽度（强制）**：正文里的 **GIF** 与 **本地视频** 必须与文章内容区同宽——GIF 用 `{{< image … width="100%" >}}`；视频用带 `width:100%` 的 `<video>`（本站 `_custom.scss` 已约束，仍须按推荐写法输出）。普通静态配图（png/jpg 截图等）不强制拉满。
 
 ## 触发词
 
@@ -160,13 +163,17 @@ resources:
 - Page Bundle（`posts/{slug}/index.md`）时：媒体也可放在同目录，用相对路径引用
 - 外链图片/视频 URL、Bilibili/YouTube 嵌入：保留原样，不下载进仓库
 - Obsidian `![[foo.png]]` / `![[bar.mp4]]` → 标准 Markdown / HTML 后，再按上表搬迁
-- 视频正文推荐：
+- **GIF**：改写为 `image` shortcode，**必须**带 `width="100%"`（LoveIt 默认按像素宽显示，不加会明显小于正文栏）：
 
-```html
-<video controls src="/videos/posts/{slug}/demo.mp4"></video>
+```markdown
+{{< image src="/images/posts/{slug}/demo.gif" caption="说明" width="100%" >}}
 ```
 
-或 Markdown：`[demo.mp4](/videos/posts/{slug}/demo.mp4)`
+- **本地视频**正文推荐（与正文同宽；勿只留裸 Markdown 链接）：
+
+```html
+<video controls playsinline preload="metadata" src="/videos/posts/{slug}/demo.mp4"></video>
+```
 
 
 
@@ -316,6 +323,7 @@ python3 scripts/fill-frontmatter.py drafts/my-article.md --dry-run
 - 不要为中英文使用不同图片/视频路径
 - 不要把外链视频下载进仓库（除非用户明确要求）
 - 不要发布无配图文章（除非用户明确说「不要配图」）
+- 不要发布未设 `width="100%"` 的正文 GIF，或仅用 Markdown 链接代替同宽 `<video>`
 - 不要在「本地测试」或 push/build 失败时删除 `drafts/` 草稿
 - 不要删除 Obsidian 等非 `drafts/` 路径的源文件
 - 不要清空整个 `drafts/` 目录（只删本篇相关文件）

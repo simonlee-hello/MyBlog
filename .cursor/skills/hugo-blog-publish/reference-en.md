@@ -59,6 +59,7 @@ Page Bundle 与单文件模式均遵循：`index.md` ↔ `index.en.md`。
 - **配图必填**：`featuredImage` + `featuredImagePreview`（通常同一文件），效果对齐 https://hugoloveit.com 首页宽幅封面
 - Page Bundle 内媒体只存一份，英文 `index.en.md` 引用同目录文件
 - 翻译时保留图片/视频路径与 `src`；可翻译 alt/caption
+- **GIF / 视频宽度**：英文版须与中文一致——GIF 的 `image` shortcode 保留 `width="100%"`；`<video>` 标签结构不变
 
 ## 同步策略
 
@@ -78,3 +79,4 @@ Page Bundle 与单文件模式均遵循：`index.md` ↔ `index.en.md`。
 - [ ] 预览路径：`/{slug}/` 与 `/en/{slug}/`
 - [ ] 首页与文章页可见 `featuredImage` 配图
 - [ ] 中英文 `featuredImage` 路径一致
+- [ ] 正文 GIF 均带 `width="100%"`；本地视频为同宽 `<video>` 写法
