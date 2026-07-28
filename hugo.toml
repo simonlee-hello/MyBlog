@@ -119,6 +119,13 @@ ignoreErrors = ["error-remote-getjson"]
     [params.home.posts]
       enable = true
       paginate = 6
+    # 首页右侧「最新评论」（优先实时拉取 GitHub Discussions / Giscus）
+    [params.home.recentComments]
+      enable = true
+      limit = 10
+      title = "最新评论"
+      repo = "simonlee-hello/MyBlog"
+      dataURL = "/data/recent-comments.json"
 
   [params.page]
     hiddenFromHomePage = false

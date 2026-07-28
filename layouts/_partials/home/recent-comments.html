@@ -1,0 +1,27 @@
+{{- $cfg := .Site.Params.home.recentComments | default dict -}}
+{{- $limit := $cfg.limit | default 10 -}}
+{{- $title := $cfg.title | default "最新评论" -}}
+{{- $dataURL := $cfg.dataURL | default "/data/recent-comments.json" -}}
+{{- $repo := $cfg.repo | default .Site.Params.page.comment.giscus.repo | default "simonlee-hello/MyBlog" -}}
+{{- $isHome := eq .Kind "home" -}}
+{{- if not $isHome -}}{{- return -}}{{- end -}}
+
+<aside class="recent-comments" id="recent-comments"
+    data-limit="{{ $limit }}"
+    data-url="{{ $dataURL }}"
+    data-repo="{{ $repo }}"
+    data-index="{{ "index.json" | relURL }}"
+    aria-label="{{ $title }}">
+    <div class="recent-comments__head">
+        <h2 class="recent-comments__title">
+            <i class="far fa-comments" aria-hidden="true"></i>
+            {{ $title }}
+        </h2>
+        <span class="recent-comments__meta" data-role="meta">加载中…</span>
+    </div>
+    <div class="recent-comments__list" data-role="list" aria-live="polite">
+        <div class="recent-comments__empty" data-role="loading">正在拉取评论…</div>
+    </div>
+</aside>
+
+<script defer src="{{ "js/recent-comments.js" | relURL }}"></script>

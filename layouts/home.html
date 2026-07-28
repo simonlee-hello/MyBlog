@@ -2,8 +2,10 @@
     {{- $params := .Scratch.Get "params" -}}
     {{- $profile := .Site.Params.home.profile -}}
     {{- $posts := .Site.Params.home.posts -}}
+    {{- $recentComments := .Site.Params.home.recentComments -}}
+    {{- $showRecentComments := ne $recentComments.enable false -}}
 
-    <div class="page home"{{ if ne $posts.enable false }} data-home="posts"{{ end }}>
+    <div class="page home{{ if $showRecentComments }} has-recent-comments{{ end }}"{{ if ne $posts.enable false }} data-home="posts"{{ end }}>
         {{- /* Profile */ -}}
         {{- if ne $profile.enable false -}}
             {{- partial "home/profile.html" . -}}
@@ -18,7 +20,7 @@
             </div>
         {{- end -}}
 
-        {{- /* Posts */ -}}
+        {{- /* Posts + optional recent comments sidebar */ -}}
         {{- if ne $posts.enable false | and .Site.RegularPages -}}
             {{- /* Paginate */ -}}
             {{- $pages := where .Site.RegularPages "Type" "posts" -}}
@@ -32,12 +34,27 @@
             {{- else -}}
                 {{- $pages = .Paginate $pages -}}
             {{- end -}}
+
+            {{- if $showRecentComments -}}
+            <div class="home-layout">
+                <div class="home-layout__main">
+                    <div class="post-list">
+                        {{- range $pages.Pages -}}
+                            {{- .Render "summary" -}}
+                        {{- end -}}
+                    </div>
+                    {{- partial "paginator.html" . -}}
+                </div>
+                {{- partial "home/recent-comments.html" . -}}
+            </div>
+            {{- else -}}
             <div class="post-list">
                 {{- range $pages.Pages -}}
                     {{- .Render "summary" -}}
                 {{- end -}}
             </div>
             {{- partial "paginator.html" . -}}
+            {{- end -}}
         {{- end -}}
     </div>
 {{- end -}}

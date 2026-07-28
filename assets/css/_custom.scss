@@ -103,6 +103,242 @@ body[theme="dark"] a:hover {
   color: #5eead4;
 }
 
+// ---------- 首页：文章居中 + 右侧评论（不挤占文章区）----------
+// 三栏：左等宽留白 | 文章框 | 右评论框
+// 左右对称 → 文章视觉居中；align-items: stretch → 两框等高
+
+.page.home.has-recent-comments {
+  width: unquote('min(1680px, calc(100% - 2rem))');
+  max-width: none;
+  overflow: visible;
+}
+
+.home-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1080px) minmax(0, 1fr);
+  align-items: start; // 仅顶部对齐；滚到底时 sticky 自然贴齐文章区底部
+  column-gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.home-layout__main {
+  grid-column: 2;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.recent-comments {
+  grid-column: 3;
+  justify-self: start;
+  align-self: start;
+  position: sticky;
+  top: 4.5rem;
+  width: 100%;
+  max-width: 280px;
+  min-width: 0;
+  height: auto;
+  max-height: calc(100vh - 5.5rem);
+  box-sizing: border-box;
+  overflow: auto;
+  padding: 1rem 1.05rem;
+  border-radius: .75rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  scrollbar-width: thin;
+}
+
+.recent-comments__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: .5rem;
+  padding-bottom: .7rem;
+  margin-bottom: .15rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  position: sticky;
+  top: -.05rem;
+  z-index: 1;
+  margin-left: -1.05rem;
+  margin-right: -1.05rem;
+  padding-left: 1.05rem;
+  padding-right: 1.05rem;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.recent-comments__title {
+  margin: 0;
+  font-size: .95rem;
+  font-weight: 600;
+  line-height: 1.3;
+
+  i {
+    margin-right: .35rem;
+    opacity: .85;
+  }
+}
+
+.recent-comments__meta {
+  font-size: .7rem;
+  color: #8a9199;
+  white-space: nowrap;
+}
+
+.recent-comments__item {
+  padding: .75rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: .15rem;
+  }
+}
+
+.recent-comments__top {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin-bottom: .35rem;
+}
+
+.recent-comments__avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #dbe4f0;
+}
+
+.recent-comments__avatar--fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .65rem;
+  font-weight: 600;
+  color: #0c1118;
+  background: #5eead4;
+}
+
+.recent-comments__author {
+  flex: 1;
+  min-width: 0;
+  font-size: .8rem;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recent-comments__time {
+  font-size: .68rem;
+  color: #8a9199;
+  white-space: nowrap;
+}
+
+.recent-comments__excerpt {
+  margin: 0 0 .35rem;
+  padding-left: calc(28px + .5rem);
+  font-size: .78rem;
+  line-height: 1.45;
+  color: #5c6570;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.recent-comments__post {
+  display: block;
+  padding-left: calc(28px + .5rem);
+  font-size: .72rem;
+  color: #0d9488;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.recent-comments__empty {
+  padding: 1.25rem .25rem;
+  font-size: .8rem;
+  color: #8a9199;
+  text-align: center;
+}
+
+body[theme="dark"] .recent-comments {
+  background: rgba(22, 30, 42, 0.72);
+  border-color: rgba(232, 238, 247, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+body[theme="dark"] .recent-comments__head {
+  border-bottom-color: rgba(232, 238, 247, 0.06);
+  background: rgba(22, 30, 42, 0.92);
+}
+
+body[theme="dark"] .recent-comments__item {
+  border-bottom-color: rgba(232, 238, 247, 0.05);
+}
+
+body[theme="dark"] .recent-comments__meta,
+body[theme="dark"] .recent-comments__time,
+body[theme="dark"] .recent-comments__empty {
+  color: #8b95a5;
+}
+
+body[theme="dark"] .recent-comments__excerpt {
+  color: #8b95a5;
+}
+
+body[theme="dark"] .recent-comments__post {
+  color: #5eead4;
+}
+
+body[theme="dark"] .recent-comments__avatar {
+  background: #334155;
+}
+
+// 右侧栏宽不足时改为上下堆叠，避免挤压文章区
+@media (max-width: 1400px) {
+  .page.home.has-recent-comments,
+  body[data-list-view="grid"] .page.home.has-recent-comments {
+    width: 64%;
+    max-width: 1080px;
+  }
+
+  .home-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .home-layout__main,
+  .recent-comments {
+    grid-column: auto;
+    width: 100%;
+    max-width: none;
+  }
+
+  .recent-comments {
+    position: static;
+    height: auto;
+    max-height: 28rem;
+    order: -1;
+    margin-top: 0;
+  }
+}
+
 // ---------- 列表 / B 站风格网格切换 ----------
 body[data-list-view="list"] .grid-only {
   display: none;
@@ -110,6 +346,22 @@ body[data-list-view="list"] .grid-only {
 
 body[data-list-view="list"] .featured-image-preview.is-placeholder {
   display: none;
+}
+
+// 列表视图：配图四角圆角（与网格一致用 .5rem）
+body[data-list-view="list"] .post-list .summary .featured-image-preview {
+  border-radius: .5rem;
+  overflow: hidden;
+
+  img {
+    border-radius: .5rem;
+  }
+}
+
+// 列表 + 右侧评论：评论顶边与首篇文章配图顶边对齐
+// （summary padding-top 1rem + 配图 margin-top .6rem）
+body[data-list-view="list"] .home.has-recent-comments .recent-comments {
+  margin-top: 1.6rem;
 }
 
 body[data-list-view="grid"] .list-only {
@@ -124,13 +376,24 @@ body[data-list-view="grid"] {
     max-width: none;
   }
 
+  // 有右侧评论时：仍用宽页承载三栏（左留白 + 文章 + 评论），文章列自身居中
+  .page.home.has-recent-comments {
+    width: unquote('min(1680px, calc(100% - 2rem))');
+    max-width: none;
+  }
+
   .home .post-list,
+  .home-layout .post-list,
   .archive .post-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 1.25rem 1rem;
-    margin-top: 1rem;
+    margin-top: 0;
     width: 100%;
+  }
+
+  .home:not(.has-recent-comments) .post-list {
+    margin-top: 1rem;
   }
 
   .archive .post-list > .grid-only {
@@ -265,6 +528,7 @@ body[theme="dark"][data-list-view="grid"] .post-list .summary {
     }
 
     .home .post-list,
+    .home-layout .post-list,
     .archive .post-list {
       grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
       gap: 1rem .75rem;
@@ -280,6 +544,7 @@ body[theme="dark"][data-list-view="grid"] .post-list .summary {
     }
 
     .home .post-list,
+    .home-layout .post-list,
     .archive .post-list {
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       gap: .85rem .65rem;
