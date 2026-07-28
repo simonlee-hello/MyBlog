@@ -29,14 +29,14 @@ For authorized penetration testing, security research, and defensive assessment 
 
 {{< mermaid >}}
 flowchart LR
-    subgraph S1["1. Generate Shellcode"]
+    subgraph S1["1 Generate Shellcode"]
         A1["EXE / Beacon"] --> A2["donut / go-donut"]
         A3["Cobalt Strike"] --> A4["C shellcode / .bin"]
         A2 --> B["Raw shellcode"]
         A4 --> B
     end
 
-    subgraph S2["2. Encrypt"]
+    subgraph S2["2 Encrypt"]
         B --> C{"Algorithm"}
         C --> C1["XOR"]
         C --> C2["AES"]
@@ -46,7 +46,7 @@ flowchart LR
         C3 --> D
     end
 
-    subgraph S3["3. Load / Deliver"]
+    subgraph S3["3 Load / Deliver"]
         D --> E1["Manual loader<br/>VirtualProtect / VirtualAlloc"]
         D --> E2["DLL sideload decrypt & run"]
         D --> E3["Off-the-shelf Go loader"]

@@ -29,14 +29,14 @@ library:
 
 {{< mermaid >}}
 flowchart LR
-    subgraph S1["1. 生成 Shellcode"]
+    subgraph S1["① 生成 Shellcode"]
         A1["EXE / Beacon"] --> A2["donut / go-donut"]
         A3["Cobalt Strike"] --> A4["C 格式 shellcode / .bin"]
         A2 --> B["原始 shellcode"]
         A4 --> B
     end
 
-    subgraph S2["2. 加密"]
+    subgraph S2["② 加密"]
         B --> C{"加密算法"}
         C --> C1["XOR"]
         C --> C2["AES"]
@@ -46,7 +46,7 @@ flowchart LR
         C3 --> D
     end
 
-    subgraph S3["3. 加载 / 交付"]
+    subgraph S3["③ 加载 / 交付"]
         D --> E1["手动加载器<br/>VirtualProtect / VirtualAlloc"]
         D --> E2["白加黑 DLL 解密执行"]
         D --> E3["Go 现成加载器"]
