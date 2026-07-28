@@ -1,0 +1,5 @@
+{{- /* IDs still via Scratch during Content render; script load via page library.js (CF-safe) */ -}}
+{{- $id := dict "Content" .Content "Scratch" .Page.Scratch | partial "function/id.html" -}}
+<div class="mermaid" id="{{ $id }}">{{ .Content }}</div>
+{{- /* Intentionally do not SetInMap mermaid — CF builds may drop Scratch flags;
+     this post loads Mermaid via front matter library.js. theme.js uses textContent fallback. */ -}}

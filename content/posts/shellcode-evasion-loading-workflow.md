@@ -11,6 +11,10 @@ lightgallery: true
 toc:
   enable: true
   auto: true
+# Cloudflare 构建偶发未注入 LoveIt Scratch 标记，导致 mermaid.js 未加载；此处强制引入
+library:
+  js:
+    mermaid: https://cdn.jsdelivr.net/npm/mermaid@11.5.0/dist/mermaid.min.js
 ---
 
 从 EXE/Beacon 提取或 Cobalt Strike 直接生成 shellcode，经 XOR/AES 加密后，可通过独立加载器或白加黑 DLL 在目标环境解密执行。本文按「生成 → 加密 → 加载 → 交付」梳理完整链路，并给出 CS 白加黑与 GodPotato 两个实战案例。

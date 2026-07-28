@@ -11,6 +11,10 @@ lightgallery: true
 toc:
   enable: true
   auto: true
+# Force-load Mermaid when CF build skips LoveIt Scratch-based injection
+library:
+  js:
+    mermaid: https://cdn.jsdelivr.net/npm/mermaid@11.5.0/dist/mermaid.min.js
 ---
 
 Whether extracted from an EXE/Beacon via donut or generated directly from Cobalt Strike, shellcode is typically XOR/AES-encrypted and then executed through a standalone loader or a sideloaded DLL. This post walks through the full chain—generation, encryption, loading, and delivery—with two practical case studies.
