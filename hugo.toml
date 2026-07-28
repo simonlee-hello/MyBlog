@@ -144,6 +144,9 @@ ignoreErrors = ["error-remote-getjson"]
     [params.page.code]
       copy = true
       maxShownLines = 50
+    [params.page.code.render]
+      mermaid = true
+      goat = true
     [params.page.math]
       enable = false
     [params.page.mapbox]

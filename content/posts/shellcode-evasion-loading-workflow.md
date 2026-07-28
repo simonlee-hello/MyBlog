@@ -23,7 +23,7 @@ toc:
 
 ## 整体流程
 
-```mermaid
+{{< mermaid >}}
 flowchart LR
     subgraph S1["1. 生成 Shellcode"]
         A1["EXE / Beacon"] --> A2["donut / go-donut"]
@@ -50,7 +50,7 @@ flowchart LR
         E1 --> G["独立 EXE 执行"]
         E3 --> G
     end
-```
+{{< /mermaid >}}
 
 白加黑 DLL 劫持原理详见已发布文章：[Windows 白加黑技术剖析](https://blog.leeissonba.com/posts/windows-dll-hijacking-analysis/)。
 
@@ -392,7 +392,7 @@ GOOS=windows GOARCH=amd64 go build
 
 典型链路：**CS 生成 shellcode → XOR 加密存盘 → 恶意 DLL 读取解密执行 → 白 EXE 触发加载**。
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A["Cobalt Strike 生成 C shellcode"] --> B["保存为 .bin"]
     B --> C["ShellcodeEncrypt.py XOR 加密"]
@@ -402,7 +402,7 @@ flowchart TD
     D --> G
     G --> H["同目录部署<br/>白 EXE + 恶意 DLL + 加密文件"]
     H --> I["执行白 EXE → 上线"]
-```
+{{< /mermaid >}}
 
 DLL 劫持与搜索顺序原理见 [Windows 白加黑技术剖析](https://blog.leeissonba.com/posts/windows-dll-hijacking-analysis/)。
 
@@ -491,7 +491,7 @@ GodPotato 依赖当前 token 的 **SeImpersonatePrivilege**（常见于服务账
 - **donut 转换的 GodPotato**：属于 CLR/.NET 加载型 shellcode，务必在 DllMain 外（如 `CreateThread`）执行，见 §5.1。
 {{< /admonition >}}
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A["修改 GodPotato：cmd 写死 beacon 路径"] --> B["编译 newgod.exe"]
     B --> C["donut 提取 loader.bin"]
@@ -503,7 +503,7 @@ flowchart TD
     H --> I["在具备 SeImpersonate 的上下文中执行 et.exe"]
     I --> J["DLL（非 DllMain 重活）解密执行 GodPotato"]
     J --> K["提权后执行 beacon → SYSTEM 会话"]
-```
+{{< /mermaid >}}
 
 #### Step 1：修改 GodPotato，写死 beacon 命令
 

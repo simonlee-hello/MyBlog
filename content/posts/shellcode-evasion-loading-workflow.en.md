@@ -23,7 +23,7 @@ For authorized penetration testing, security research, and defensive assessment 
 
 ## Overview
 
-```mermaid
+{{< mermaid >}}
 flowchart LR
     subgraph S1["1. Generate Shellcode"]
         A1["EXE / Beacon"] --> A2["donut / go-donut"]
@@ -50,7 +50,7 @@ flowchart LR
         E1 --> G["Standalone EXE"]
         E3 --> G
     end
-```
+{{< /mermaid >}}
 
 For DLL hijacking fundamentals, see the published article: [Windows DLL Hijacking Analysis](https://blog.leeissonba.com/posts/windows-dll-hijacking-analysis/).
 
@@ -392,7 +392,7 @@ GOOS=windows GOARCH=amd64 go build
 
 Typical chain: **CS shellcode → XOR to disk → malicious DLL decrypts & runs → signed EXE triggers load**.
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A["Cobalt Strike C shellcode"] --> B["Save as .bin"]
     B --> C["ShellcodeEncrypt.py XOR"]
@@ -402,7 +402,7 @@ flowchart TD
     D --> G
     G --> H["Deploy together<br/>signed EXE + DLL + encrypted file"]
     H --> I["Run signed EXE → callback"]
-```
+{{< /mermaid >}}
 
 See [Windows DLL Hijacking Analysis](https://blog.leeissonba.com/posts/windows-dll-hijacking-analysis/) for hijacking mechanics.
 
@@ -491,7 +491,7 @@ GodPotato needs **SeImpersonatePrivilege** on the current token (common for serv
 - **donut’d GodPotato**: CLR/.NET loader shellcode—run outside DllMain (e.g. `CreateThread`); see §5.1.
 {{< /admonition >}}
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A["Patch GodPotato: hardcode beacon path"] --> B["Build newgod.exe"]
     B --> C["donut → loader.bin"]
@@ -503,7 +503,7 @@ flowchart TD
     H --> I["Run et.exe in SeImpersonate-capable context"]
     I --> J["DLL runs GodPotato (not heavy work in DllMain)"]
     J --> K["Elevate and run beacon → SYSTEM session"]
-```
+{{< /mermaid >}}
 
 #### Step 1: Hardcode the beacon command
 
