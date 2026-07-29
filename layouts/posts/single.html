@@ -49,8 +49,15 @@
                 {{- end -}}
             </div>
             <div class="post-meta-line">
-                {{- with .Site.Params.dateformat | default "2006-01-02" | .PublishDate.Format -}}
+                {{- $dateFormat := .Site.Params.dateformat | default "2006-01-02" -}}
+                {{- with $dateFormat | .PublishDate.Format -}}
                     <i class="far fa-calendar-alt" aria-hidden="true"></i>&nbsp;<time datetime="{{ . }}">{{ . }}</time>&nbsp;
+                {{- end -}}
+                {{- /* 仅当 lastmod 与发布日不同时展示更新时间 */ -}}
+                {{- if and (not .Lastmod.IsZero) (ne ($dateFormat | .Lastmod.Format) ($dateFormat | .PublishDate.Format)) -}}
+                    {{- with $dateFormat | .Lastmod.Format -}}
+                        <i class="far fa-calendar-check" aria-hidden="true"></i>&nbsp;<time datetime="{{ . }}">{{ dict "Date" . | T "updatedOnDate" }}</time>&nbsp;
+                    {{- end -}}
                 {{- end -}}
                 <i class="fas fa-pencil-alt" aria-hidden="true"></i>&nbsp;{{ T "wordCount" .WordCount }}&nbsp;
                 <i class="far fa-clock" aria-hidden="true"></i>&nbsp;{{ T "readingTime" .ReadingTime }}
