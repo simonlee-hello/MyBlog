@@ -1,10 +1,11 @@
 ---
 title: "Hugo + LoveIt 博客优化复盘：从搭建到可复现配置"
 date: 2026-07-13T09:44:50+08:00
+lastmod: 2026-07-29T14:02:00+08:00
 draft: false
-description: "汇总 Hugo Extended + LoveIt 博客从搭建到可复现配置的优化步骤：双语约定、Cloudflare 部署、Giscus、不蒜子与发布工作流。"
+description: "汇总 Hugo Extended + LoveIt 博客从搭建到可复现配置的优化步骤：双语约定、Cloudflare 部署、Giscus、自托管访问量与发布工作流。"
 categories: ["博客"]
-tags: ["hugo", "loveit", "cloudflare", "giscus", "busuanzi"]
+tags: ["hugo", "loveit", "cloudflare", "giscus", "analytics", "d1"]
 featuredImage: "/images/posts/hugo-loveit-blog-optimization-notes/featured.jpg"
 featuredImagePreview: "/images/posts/hugo-loveit-blog-optimization-notes/featured.jpg"
 ---
@@ -167,7 +168,7 @@ featuredImagePreview: "/images/posts/{slug}/featured.jpg"
 
 ### 5.4 LoveIt 写作技巧 skill
 
-另有 **`loveit-theme`** skill（与 publish 联动）：admonition、image、mermaid、math、Giscus、不蒜子等速查。发布时会按需把提示改成 `admonition`、B 站链接改成 shortcode 等。
+另有 **`loveit-theme`** skill（与 publish 联动）：admonition、image、mermaid、math、Giscus、访问量等速查。发布时会按需把提示改成 `admonition`、B 站链接改成 shortcode 等。
 
 官方文档见 [LoveIt](https://hugoloveit.com)。
 
@@ -248,20 +249,84 @@ Cloudflare 控制台中的项目名应与 `wrangler.jsonc` 的 `name` 保持一�
 | 用途 | 方案 | 说明 |
 |------|------|------|
 | 站长后台分析 | Cloudflare Web Analytics | 本站域名挂在主域 `leeissonba.com` 下，子域 `blog.*` 流量已出现在同一报表，过滤 Host 即可 |
-| 前台展示数字 | [不蒜子](https://busuanzi.ibruce.info/) | 页脚全站 PV/UV + 文章 meta 阅读量 |
+| 前台展示数字 | 自托管 Worker + D1（`services/web-analytics`） | 页脚全站 PV/UV + 文章 meta 阅读量；数据归自己 |
 
-Cloudflare Web Analytics **不能**直接把数字渲染到页面上（无公开前台接口）。前台计数按 [Hugo 添加不蒜子（LoveIt）](https://stilig.me/posts/hugo-adds-busuanzi/) 落地：
+Cloudflare Web Analytics **不能**把数字渲染到页面上（无公开前台接口）。曾用过不蒜子/Vercount，第三方计数会丢数重置，已弃用。
 
-- `layouts/_partials/plugin/busuanzi.html`
-- `layouts/_partials/footer.html`（全站）
-- `layouts/posts/single.html`（单页）
-- `[params.busuanzi]` 开关与文案前缀
+本站前台方案基于 [analytics_with_cloudflare](https://github.com/yestool/analytics_with_cloudflare)，并按 [Hugo 自托管访问量实践](https://bytejog.com/posts/hugo/hugo_analytics/) 补上全站 `spv` / `suv`。对照仓库即可复现。
 
-实现时注意：
+### 9.1 架构
+
+- **独立 Worker** `web-analytics`（与博客静态站 `myblog` / `simons-blog` **分开**）
+- **D1** 库 `web_analytics` 存访问记录
+- 浏览器 POST `/api/visit`：写入一条访客，并按需返回单页 `pv`、全站 `spv` / `suv`
+- Hugo 仅在 **production** 加载脚本（与 Giscus 一致）
+
+### 9.2 部署计数 API（Cloudflare）
+
+在仓库子目录操作（勿与根目录 Hugo 的 `wrangler.jsonc` 搞混）：
+
+```bash
+cd services/web-analytics
+npm install
+npx wrangler login
+npx wrangler d1 create web_analytics
+# 将返回的 database_id 写入本目录 wrangler.jsonc
+npm run initSql
+npm run deploy
+```
+
+注意：
+
+- `npm run deploy` 已带 `--config wrangler.jsonc`。若误用仓库根配置，会去跑 Hugo 的 `build.sh` 并报错
+- Dashboard → Workers → `web-analytics` → 添加自定义域，例如 `analytics.leeissonba.com`（`workers.dev` 在部分地区不可用）
+- 冒烟：`POST https://analytics.你的域名/api/visit`，body 含 `hostname`、`url`、`spv: true` 等，应返回 `{"ret":"OK","data":{...}}`
+
+### 9.3 Hugo 前台接入
+
+关键文件：
+
+| 路径 | 作用 |
+|------|------|
+| `services/web-analytics/` | Worker + D1 源码与 `wrangler.jsonc` |
+| `assets/js/analytics.js` | 请求 API，回填 `#page_pv` / `#site_pv` / `#site_uv` |
+| `layouts/_partials/plugin/web-analytics.html` | 仅 production 注入 fingerprint 脚本 |
+| `layouts/_partials/footer.html` | 全站 PV/UV 占位 + 加载脚本（全站一次） |
+| `layouts/posts/single.html` | 文章 meta「阅读量」`#page_pv` |
+| `hugo.toml` → `[params.webAnalytics]` | 开关与 `baseURL` |
+
+配置示例：
+
+```toml
+[params.webAnalytics]
+  enable = true
+  baseURL = "https://analytics.leeissonba.com"  # 与自定义域一致
+```
+
+页脚占位示例：
+
+```html
+本站总访问量 <span id="site_pv">-</span> 次 | 访客 <span id="site_uv">-</span> 人
+```
+
+文章 meta 占位示例：
+
+```html
+阅读 <span id="page_pv">-</span>
+```
+
+实现注意：
 
 - 脚本**只在 footer 加载一次**，避免重复计数
-- 使用官方 container id：`busuanzi_container_site_pv` 等
-- `site_pv` 的前缀用 `site_pv_pre`（原文示例曾误写成 `page_pv_pre`）
+- 去掉上游 demo 里对 `document.head.innerHTML` 的注入（会重建 head，易弄坏主题脚本）
+- 本地验证：`HUGO_ENV=production hugo server`；普通 `hugo server` 不加载、不计数
+- 推送博客仓库后，等静态站重建，线上才会出现数字
+
+### 9.4 验收
+
+1. 打开任意文章：meta 阅读量有数字；刷新应递增
+2. 页脚全站人次 / 访客有数字
+3. Cloudflare 里看 **`web-analytics`** Worker 的请求量（不是博客静态站 `myblog` 的 0 请求）
 
 ---
 
@@ -272,9 +337,10 @@ Cloudflare Web Analytics **不能**直接把数字渲染到页面上（无公开
 [params.page.comment]
   enable = true
 
-# 不蒜子
-[params.busuanzi]
+# 前台访问量（自托管 Worker + D1）
+[params.webAnalytics]
   enable = true
+  baseURL = "https://analytics.leeissonba.com"
 
 # 首页社交图标
 [params.home.profile]
@@ -290,15 +356,16 @@ Cloudflare Web Analytics **不能**直接把数字渲染到页面上（无公开
 从零对齐本站时，建议按序确认：
 
 1. [ ] Hugo Extended + `git submodule update --init`
-2. [ ] `hugo.toml`：`baseURL`、默认语言、社交、Giscus、不蒜子
-3. [ ] Cloudflare 项目名与 `wrangler.jsonc` 的 `name` 一致
-4. [ ] `layouts/` 弃用 API 覆盖 + busuanzi / footer / posts/single
-5. [ ] `assets/css/_custom.scss` 代码与视频样式
-6. [ ] Cloudflare：连接仓库、构建脚本、自定义域名、`HUGO_ENV=production`
+2. [ ] `hugo.toml`：`baseURL`、默认语言、社交、Giscus、`webAnalytics`
+3. [ ] Cloudflare 博客项目名与根目录 `wrangler.jsonc` 的 `name` 一致
+4. [ ] `layouts/` 弃用 API 覆盖 + footer / posts/single / web-analytics partial
+5. [ ] `assets/css/_custom.scss` 代码与视频样式；`assets/js/analytics.js` 已就位
+6. [ ] Cloudflare 博客：连接仓库、构建脚本、自定义域名、`HUGO_ENV=production`
 7. [ ] Giscus App 已安装；Discussions 已开
 8. [ ] （可选）Web Analytics 过滤 `blog.` 子域
-9. [ ] 发布用 Cursor skills：`hugo-blog-publish` + `loveit-theme`
-10. [ ] 试发一篇：中英文、`featuredImage`、本地媒体路径、`<!--more-->`
+9. [ ] 部署 `services/web-analytics`：D1 + Worker + 自定义域，与 `baseURL` 一致
+10. [ ] 发布用 Cursor skills：`hugo-blog-publish` + `loveit-theme`
+11. [ ] 试发一篇：中英文、`featuredImage`、本地媒体路径、`<!--more-->`；生产环境核对阅读量
 
 ---
 
@@ -307,6 +374,7 @@ Cloudflare Web Analytics **不能**直接把数字渲染到页面上（无公开
 - [LoveIt 主题文档](https://hugoloveit.com)
 - [Host on Cloudflare（Hugo）](https://gohugo.io/host-and-deploy/host-on-cloudflare/)
 - [Giscus](https://giscus.app/)
-- [不蒜子](https://busuanzi.ibruce.info/)
-- [Hugo 添加访问统计功能（LoveIt + 不蒜子）](https://stilig.me/posts/hugo-adds-busuanzi/)
+- [analytics_with_cloudflare](https://github.com/yestool/analytics_with_cloudflare)
+- [Hugo 自托管访问量（Worker + D1）](https://bytejog.com/posts/hugo/hugo_analytics/)
+- 本仓库：`services/web-analytics/README.md`
 - Cloudflare Dashboard → Analytics & Logs → Web Analytics

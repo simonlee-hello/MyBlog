@@ -1,10 +1,11 @@
 ---
 title: "Hugo + LoveIt Blog Optimization Notes: From Setup to a Reproducible Config"
 date: 2026-07-13T09:44:50+08:00
+lastmod: 2026-07-29T14:02:00+08:00
 draft: false
-description: "A reproducible walkthrough of optimizing a Hugo Extended + LoveIt blog: bilingual content, Cloudflare deploy, Giscus, Busuanzi, and the publish workflow."
+description: "A reproducible walkthrough of optimizing a Hugo Extended + LoveIt blog: bilingual content, Cloudflare deploy, Giscus, self-hosted visit counters, and the publish workflow."
 categories: ["blog"]
-tags: ["hugo", "loveit", "cloudflare", "giscus", "busuanzi"]
+tags: ["hugo", "loveit", "cloudflare", "giscus", "analytics", "d1"]
 featuredImage: "/images/posts/hugo-loveit-blog-optimization-notes/featured.jpg"
 featuredImagePreview: "/images/posts/hugo-loveit-blog-optimization-notes/featured.jpg"
 ---
@@ -167,7 +168,7 @@ External image URLs and Bilibili / YouTube embeds stay as-is; Bilibili can use L
 
 ### 5.4 LoveIt writing skill
 
-There is also a **`loveit-theme`** skill (linked from publish): quick reference for admonition, image, mermaid, math, Giscus, Busuanzi, and more. Publish may lightly upgrade tips to `admonition` or Bilibili links to shortcodes.
+There is also a **`loveit-theme`** skill (linked from publish): quick reference for admonition, image, mermaid, math, Giscus, visit counters, and more. Publish may lightly upgrade tips to `admonition` or Bilibili links to shortcodes.
 
 Official docs: [LoveIt](https://hugoloveit.com).
 
@@ -248,20 +249,84 @@ Comment data lives in the repo's Discussions.
 | Purpose | Tool | Notes |
 |---------|------|-------|
 | Owner dashboard | Cloudflare Web Analytics | Zone covers `leeissonba.com`; `blog.*` traffic already shows up—filter by Host |
-| On-page numbers | [Busuanzi](https://busuanzi.ibruce.info/) | Footer site PV/UV + post meta page views |
+| On-page numbers | Self-hosted Worker + D1 (`services/web-analytics`) | Footer site PV/UV + post meta page views; you own the data |
 
-Cloudflare Web Analytics **cannot** render counts on the public page (no public front-end API). On-page counters follow [Hugo + Busuanzi on LoveIt](https://stilig.me/posts/hugo-adds-busuanzi/):
+Cloudflare Web Analytics **cannot** render counts on the public page (no public front-end API). Busuanzi/Vercount were tried earlier and dropped because third-party counters can reset.
 
-- `layouts/_partials/plugin/busuanzi.html`
-- `layouts/_partials/footer.html` (site-wide)
-- `layouts/posts/single.html` (per post)
-- `[params.busuanzi]` toggles and label prefixes
+This site follows [analytics_with_cloudflare](https://github.com/yestool/analytics_with_cloudflare), with site-wide `spv` / `suv` as in [Hugo self-hosted visit counters](https://bytejog.com/posts/hugo/hugo_analytics/). Reproduce against the repository.
+
+### 9.1 Architecture
+
+- **Separate Worker** `web-analytics` (not the blog static Worker `myblog` / `simons-blog`)
+- **D1** database `web_analytics` stores visits
+- Browser `POST /api/visit`: insert one row; optionally return page `pv` and site `spv` / `suv`
+- Hugo loads the script only in **production** (same gate as Giscus)
+
+### 9.2 Deploy the counter API (Cloudflare)
+
+Work in the subdirectory (do not confuse with the root Hugo `wrangler.jsonc`):
+
+```bash
+cd services/web-analytics
+npm install
+npx wrangler login
+npx wrangler d1 create web_analytics
+# Write the returned database_id into this directory's wrangler.jsonc
+npm run initSql
+npm run deploy
+```
+
+Notes:
+
+- `npm run deploy` passes `--config wrangler.jsonc`. Using the repo-root config will try Hugo's `build.sh` and fail
+- Dashboard → Workers → `web-analytics` → add a custom domain such as `analytics.leeissonba.com` (`workers.dev` is blocked in some regions)
+- Smoke test: `POST https://analytics.your-domain/api/visit` with `hostname`, `url`, `spv: true`, etc.; expect `{"ret":"OK","data":{...}}`
+
+### 9.3 Wire Hugo front end
+
+Key files:
+
+| Path | Role |
+|------|------|
+| `services/web-analytics/` | Worker + D1 source and `wrangler.jsonc` |
+| `assets/js/analytics.js` | Call API; fill `#page_pv` / `#site_pv` / `#site_uv` |
+| `layouts/_partials/plugin/web-analytics.html` | Inject fingerprinted script in production only |
+| `layouts/_partials/footer.html` | Site PV/UV placeholders + load script once |
+| `layouts/posts/single.html` | Post meta “views” `#page_pv` |
+| `hugo.toml` → `[params.webAnalytics]` | Toggle and `baseURL` |
+
+Config example:
+
+```toml
+[params.webAnalytics]
+  enable = true
+  baseURL = "https://analytics.leeissonba.com"  # must match custom domain
+```
+
+Footer placeholders:
+
+```html
+Site visits <span id="site_pv">-</span> · Visitors <span id="site_uv">-</span>
+```
+
+Post meta placeholder:
+
+```html
+Views <span id="page_pv">-</span>
+```
 
 Implementation notes:
 
 - Load the script **once in the footer** to avoid double counting
-- Use official container ids such as `busuanzi_container_site_pv`
-- Prefer `site_pv_pre` for site PV prefixes (the reference post once used `page_pv_pre` by mistake)
+- Do not use the upstream demo’s `document.head.innerHTML += …` (rebuilds `<head>` and can break theme scripts)
+- Local check: `HUGO_ENV=production hugo server`; plain `hugo server` does not load or count
+- Push the blog repo and wait for the static rebuild before numbers appear in production
+
+### 9.4 Acceptance
+
+1. Open any post: meta views show a number; refresh should increase it
+2. Footer site PV / UV show numbers
+3. In Cloudflare, check request volume on the **`web-analytics`** Worker (not the zero-request static `myblog` app)
 
 ---
 
@@ -272,9 +337,10 @@ Implementation notes:
 [params.page.comment]
   enable = true
 
-# Busuanzi
-[params.busuanzi]
+# on-page counters (self-hosted Worker + D1)
+[params.webAnalytics]
   enable = true
+  baseURL = "https://analytics.leeissonba.com"
 
 # home social icons
 [params.home.profile]
@@ -290,15 +356,16 @@ Keep theme overrides under project `layouts/` and `assets/` so LoveIt submodule 
 When aligning a fresh copy with this site:
 
 1. [ ] Hugo Extended + `git submodule update --init`
-2. [ ] `hugo.toml`: `baseURL`, default language, social, Giscus, Busuanzi
-3. [ ] Cloudflare project name matches `wrangler.jsonc` `name`
-4. [ ] `layouts/` deprecation overrides + busuanzi / footer / posts/single
-5. [ ] `assets/css/_custom.scss` for code and video
-6. [ ] Cloudflare: connected repo, build script, custom domain, `HUGO_ENV=production`
+2. [ ] `hugo.toml`: `baseURL`, default language, social, Giscus, `webAnalytics`
+3. [ ] Cloudflare blog project name matches root `wrangler.jsonc` `name`
+4. [ ] `layouts/` deprecation overrides + footer / posts/single / web-analytics partial
+5. [ ] `assets/css/_custom.scss` for code and video; `assets/js/analytics.js` in place
+6. [ ] Cloudflare blog: connected repo, build script, custom domain, `HUGO_ENV=production`
 7. [ ] Giscus App installed; Discussions enabled
 8. [ ] (Optional) Web Analytics filter for `blog.` host
-9. [ ] Cursor skills: `hugo-blog-publish` + `loveit-theme`
-10. [ ] Smoke-test one post: bilingual, `featuredImage`, local media paths, `<!--more-->`
+9. [ ] Deploy `services/web-analytics`: D1 + Worker + custom domain matching `baseURL`
+10. [ ] Cursor skills: `hugo-blog-publish` + `loveit-theme`
+11. [ ] Smoke-test one post: bilingual, `featuredImage`, local media paths, `<!--more-->`; verify views in production
 
 ---
 
@@ -307,6 +374,7 @@ When aligning a fresh copy with this site:
 - [LoveIt docs](https://hugoloveit.com)
 - [Host on Cloudflare (Hugo)](https://gohugo.io/host-and-deploy/host-on-cloudflare/)
 - [Giscus](https://giscus.app/)
-- [Busuanzi](https://busuanzi.ibruce.info/)
-- [Hugo visit counters (LoveIt + Busuanzi)](https://stilig.me/posts/hugo-adds-busuanzi/)
+- [analytics_with_cloudflare](https://github.com/yestool/analytics_with_cloudflare)
+- [Hugo self-hosted visit counters (Worker + D1)](https://bytejog.com/posts/hugo/hugo_analytics/)
+- This repo: `services/web-analytics/README.md`
 - Cloudflare Dashboard → Analytics & Logs → Web Analytics
