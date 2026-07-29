@@ -310,13 +310,9 @@ body[theme="dark"] .recent-comments__avatar {
 }
 
 // 右侧栏宽不足时改为上下堆叠，避免挤压文章区
+// 宽度只在桌面窄屏恢复 LoveIt 居中比例；平板/手机跟主题一致（80%/100%），
+// 否则 has-recent-comments 的 64% 会盖住 LoveIt ≤680px 的 width:100%，列表显得过窄
 @media (max-width: 1400px) {
-  .page.home.has-recent-comments,
-  body[data-list-view="grid"] .page.home.has-recent-comments {
-    width: 64%;
-    max-width: 1080px;
-  }
-
   .home-layout {
     display: flex;
     flex-direction: column;
@@ -336,6 +332,27 @@ body[theme="dark"] .recent-comments__avatar {
     max-height: 28rem;
     order: -1;
     margin-top: 0;
+  }
+}
+
+@media (max-width: 1400px) and (min-width: 961px) {
+  .page.home.has-recent-comments {
+    width: 64%;
+    max-width: 1080px;
+  }
+}
+
+@media (max-width: 960px) {
+  .page.home.has-recent-comments {
+    width: 80%;
+    max-width: 1080px;
+  }
+}
+
+@media (max-width: 680px) {
+  .page.home.has-recent-comments {
+    width: 100%;
+    max-width: none;
   }
 }
 
