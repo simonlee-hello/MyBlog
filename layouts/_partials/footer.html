@@ -46,6 +46,15 @@
                     <span class="icp">{{ . | safeHTML }}</span>
                 {{- end -}}
             </div>
+
+            {{- /* Site PV / UV (self-hosted web analytics) */ -}}
+            {{- $webAnalytics := .Site.Params.webAnalytics | default dict -}}
+            {{- if and (ne $webAnalytics.enable false) (eq hugo.Environment "production") -}}
+                <div class="footer-line">
+                    本站总访问量&nbsp;<span id="site_pv">-</span>&nbsp;次&nbsp;|&nbsp;访客&nbsp;<span id="site_uv">-</span>&nbsp;人
+                </div>
+            {{- end -}}
         </div>
     </footer>
+    {{- partial "plugin/web-analytics.html" . -}}
 {{- end -}}

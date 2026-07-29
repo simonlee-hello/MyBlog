@@ -1,0 +1,12 @@
+{
+  "name": "web-analytics",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-06-14",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "web_analytics",
+      "database_id": "8141b78a-9c8e-482c-ad91-61e6484141f9"
+    }
+  ]
+}

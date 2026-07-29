@@ -70,7 +70,29 @@ hugo new posts/my-new-post.md
 
 ## 访问统计
 
-站长后台用 [Cloudflare Web Analytics](https://dash.cloudflare.com/)（按 Host 过滤 `blog.` 子域即可）。前台阅读量/访客数曾接不蒜子/Vercount，因第三方计数会丢数重置，已移除。
+两套分工：
+
+| 用途 | 方案 | 说明 |
+|------|------|------|
+| 站长后台分析 | [Cloudflare Web Analytics](https://dash.cloudflare.com/) | 按 Host 过滤 `blog.` 子域 |
+| 前台阅读量 / 全站 PV·UV | 自托管 Worker + D1（[`services/web-analytics`](services/web-analytics/)） | 文章 meta 阅读量 + 页脚全站计数 |
+
+### 前台计数部署
+
+```bash
+cd services/web-analytics
+npm install
+npx wrangler login
+npx wrangler d1 create web_analytics   # database_id 写入 wrangler.jsonc
+npm run initSql
+npm run deploy
+```
+
+Dashboard → Workers → `web-analytics` → 自定义域 `analytics.leeissonba.com`（需与 `hugo.toml` 里 `[params.webAnalytics].baseURL` 一致）。
+
+> 在 `services/web-analytics` 下部署；`npm run deploy` 已指定 `--config wrangler.jsonc`，避免误用仓库根目录 Hugo 站的配置。
+
+仅 `HUGO_ENV=production` 时加载脚本；本地验证：`HUGO_ENV=production hugo server`。
 
 ## 部署到 Cloudflare Workers
 

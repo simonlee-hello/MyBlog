@@ -1,0 +1,15 @@
+{{- /* Self-hosted page/site counters (Cloudflare Worker + D1). Load once in footer. */ -}}
+{{- $cfg := .Site.Params.webAnalytics | default dict -}}
+{{- if and (ne $cfg.enable false) (eq hugo.Environment "production") -}}
+    {{- $baseURL := $cfg.baseURL | default "https://analytics.leeissonba.com" -}}
+    {{- $js := resources.Get "js/analytics.js" -}}
+    {{- with $js -}}
+        {{- $js = . | minify | fingerprint -}}
+        <script defer src="{{ $js.RelPermalink }}"
+            integrity="{{ $js.Data.Integrity }}"
+            data-base-url="{{ $baseURL }}"
+            data-page-pv-id="page_pv"
+            data-site-pv-id="site_pv"
+            data-site-uv-id="site_uv"></script>
+    {{- end -}}
+{{- end -}}

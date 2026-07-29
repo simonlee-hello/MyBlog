@@ -75,6 +75,12 @@ ignoreErrors = ["error-remote-getjson"]
     author = true
     since = 2026
 
+  # 前台访问量：自托管 Cloudflare Worker + D1（services/web-analytics）
+  # 仅 production 加载；部署 API 后确认 baseURL
+  [params.webAnalytics]
+    enable = true
+    baseURL = "https://analytics.leeissonba.com"
+
   [params.section]
     paginate = 20
     dateFormat = "01-02"

@@ -28,7 +28,7 @@ description: >-
 | 配图 | `static/images/posts/{slug}/featured.jpg` + front matter `featuredImage` |
 | 视频 | `static/videos/posts/{slug}/` 或 `bilibili` shortcode |
 | 评论 | Giscus（`params.page.comment.giscus`），仅 **production** 环境加载 |
-| 访问统计 | Cloudflare Web Analytics（站长后台）；前台 PV/UV 已移除 |
+| 访问统计 | 后台 Cloudflare Web Analytics；前台自托管 Worker+D1（`params.webAnalytics`） |
 | 自定义样式 | `assets/css/_custom.scss`（勿改 themes/LoveIt） |
 | 主题覆盖 | 项目 `layouts/` 覆盖主题 partial（已修 Hugo 弃用 API） |
 
@@ -208,7 +208,12 @@ Markdown 里 `\(` `\[` 等易被 Hugo 吃掉时，用 `raw` shortcode 包公式�
 
 ## 访问统计
 
-站长后台：Cloudflare Web Analytics。前台不蒜子/Vercount 因第三方数据会重置，已移除，勿再接入同类免费计数。
+- **站长后台**：Cloudflare Web Analytics（按 Host 过滤 `blog.`）。
+- **前台展示**：自托管 [`services/web-analytics`](../../../services/web-analytics/)（Cloudflare Worker + D1），配置 `[params.webAnalytics]`。
+  - 文章 meta：`#page_pv` 阅读量
+  - 页脚：`#site_pv` / `#site_uv` 全站人次 / 访客
+  - 仅 **production** 加载（与 Giscus 一致）
+  - 勿再接入不蒜子/Vercount 等会丢数重置的第三方前台计数
 
 ## 与 hugo-blog-publish 的分工
 

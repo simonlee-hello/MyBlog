@@ -54,6 +54,10 @@
                 {{- end -}}
                 <i class="fas fa-pencil-alt" aria-hidden="true"></i>&nbsp;{{ T "wordCount" .WordCount }}&nbsp;
                 <i class="far fa-clock" aria-hidden="true"></i>&nbsp;{{ T "readingTime" .ReadingTime }}
+                {{- $webAnalytics := .Site.Params.webAnalytics | default dict -}}
+                {{- if and (ne $webAnalytics.enable false) (eq hugo.Environment "production") -}}
+                    &nbsp;<i class="far fa-eye" aria-hidden="true"></i>&nbsp;阅读&nbsp;<span id="page_pv">-</span>
+                {{- end -}}
             </div>
         </div>
 
