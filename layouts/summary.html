@@ -37,6 +37,13 @@
             </span>
         {{- end -}}
 
+        {{- $webAnalytics := .Site.Params.webAnalytics | default dict -}}
+        {{- if and (ne $webAnalytics.enable false) (eq hugo.Environment "production") -}}
+            &nbsp;<span class="post-pv" title="阅读量">
+                <i class="far fa-eye" aria-hidden="true"></i>&nbsp;<span data-pv-path="{{ .RelPermalink }}">-</span>
+            </span>
+        {{- end -}}
+
         {{- $categories := slice -}}
         {{- range .Params.categories -}}
             {{- $category := partialCached "function/path.html" . . | printf "/categories/%v" | $.Site.GetPage -}}

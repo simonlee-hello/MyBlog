@@ -27,3 +27,9 @@ Cloudflare Dashboard → Workers → `web-analytics` → 自定义域：`analyti
 请求体字段：`hostname`、`url`、`referrer`，以及可选布尔标记 `pv` / `uv` / `spv` / `suv`。
 
 返回：`{ ret: "OK", data: { pv?, uv?, spv?, suv? } }`
+
+`POST /api/pv`（只读，不写入）
+
+请求体：`{ hostname, paths: string[] }`（最多 50 条）。
+
+返回：`{ ret: "OK", data: { "/path/": 12, ... } }`

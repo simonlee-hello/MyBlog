@@ -92,6 +92,54 @@ app.post('/api/visit', async (c) => {
   }
 })
 
+/** 只读批量查询路径 PV，不写入访客（用于首页/列表卡片） */
+app.post('/api/pv', async (c) => {
+  const retObj = { ret: 'ERROR', data: null, message: 'Error, Internal Server Error' }
+  try {
+    const body = await c.req.json()
+    const hostname = body.hostname
+    const paths: unknown = body.paths
+    if (!hostname || !Array.isArray(paths) || paths.length === 0) {
+      return c.json({ ret: 'ERROR', data: null, message: 'hostname and paths required' })
+    }
+    const uniquePaths = [
+      ...new Set(
+        paths
+          .filter((p): p is string => typeof p === 'string' && p.length > 0 && p.length < 2048)
+          .slice(0, 50)
+      ),
+    ]
+    if (uniquePaths.length === 0) {
+      return c.json({ ret: 'ERROR', data: null, message: 'no valid paths' })
+    }
+    const website = await c.env.DB.prepare('select id from t_website where domain = ?')
+      .bind(hostname)
+      .first('id')
+    const counts: Record<string, number> = {}
+    for (const p of uniquePaths) {
+      counts[p] = 0
+    }
+    if (!website) {
+      return c.json({ ret: 'OK', data: counts })
+    }
+    const websiteId = Number(website)
+    const placeholders = uniquePaths.map(() => '?').join(',')
+    const rows = await c.env.DB.prepare(
+      `SELECT url_path, COUNT(*) AS total FROM t_web_visitor WHERE website_id = ? AND url_path IN (${placeholders}) GROUP BY url_path`
+    )
+      .bind(websiteId, ...uniquePaths)
+      .all()
+    for (const row of rows.results || []) {
+      const urlPath = String((row as { url_path: string }).url_path)
+      counts[urlPath] = Number((row as { total: number }).total)
+    }
+    return c.json({ ret: 'OK', data: counts })
+  } catch (e) {
+    console.error(e)
+    return c.json(retObj)
+  }
+})
+
 app.onError((err, c) => {
   console.error(`${err}`)
   return c.text(err.toString())
